@@ -1,0 +1,6 @@
+compiled/
+.vscode/
+build*/
+tmp_build/
+PyLast/
+TMP/

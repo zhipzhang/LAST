@@ -1,0 +1,4 @@
+{
+	"EOS_URL":"root://eos01.ihep.ac.cn/",
+	"MAX_IO_LENGTH": 100000000000
+}

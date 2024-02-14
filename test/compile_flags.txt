@@ -1,0 +1,13 @@
+-xc++
+-I 
+/usr/include/root/
+-I 
+/data/home/zhipz/local/include/xrootd/
+-I
+/data/home/zhipz/local/include/nlohmann
+-I
+/data/home/zhipz/local/include/
+-I
+/data/home/zhipz/MyCode/LAST/LASTCore/
+-I
+/data/home/zhipz/MyCode/LAST/LASTIO/    

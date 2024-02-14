@@ -1,0 +1,6 @@
+add_executable(test LConvetertest.cpp)
+target_link_libraries(test DLs  glog::glog)
+add_executable(test2 LDL0test.cpp)
+target_link_libraries(test2 DLs  glog::glog)
+add_executable(test3 LDL1test.cpp)
+target_link_libraries(test3 DLs  glog::glog)
