@@ -112,6 +112,7 @@ void LImageProcessor::InitGeometry(const LTelescopes<std::shared_ptr<LRTelescope
     auto tels_id = tels_config.GetKeys();
     int itel = tels_id[0];
     tel_geometry = new LCameraGeometry((tels_config)[itel]->camera_name.Data(), (tels_config)[itel]->num_pixels, (tels_config)[itel]->pix_x, (tels_config)[itel]->pix_y, (tels_config)[itel]->pix_size, (tels_config)[itel]->pix_shape);
+    focal_length = (tels_config)[itel]->focal_length;
     same_geometry = true;
 }
 
@@ -143,15 +144,16 @@ void LImageProcessor::ParameterizationImage(const LDL0Event& dl0event, LDL1Event
     dl1event.Clear();
     for(auto itel :dl0event.GetTelList())
     {
-        int event_id = dl0event.GetTelEvent(itel)->GetEventId();
-        auto dl0tel_event = dl0event.GetTelEvent(itel);
-        ProcessClean(*dl0tel_event);
+        dl1event.GetEventArrayInfo() = dl0event.GetShowerInfo();
+        int event_id = dl0event[itel].GetEventId();
+        ProcessClean(dl0event[itel]);
         if(num_image_pixels < min_image_pixels)
         {
            continue; 
         }
         auto dl1televent = std::make_shared<LRDL1TelEvent>();
-        dl1televent->SetTelHillas(event_id, itel, Compute_Hillas(*tel_geometry, cleaned_image));
+        dl1televent->SetTelHillas(event_id, itel, Compute_Hillas(*tel_geometry, cleaned_image).ConvertRad(focal_length));
+        dl1televent->SetTelPointing(dl0event[itel].GetTelAlt(), dl0event[itel].GetTelAz());
         Compute_Leakage(*dl1televent);
         Compute_Concentration(*dl1televent);
         Compute_Intensity(*dl1televent);
@@ -204,15 +206,15 @@ void LImageProcessor::Compute_Concentration(LRDL1TelEvent &dl1televent)
 }
 void LImageProcessor::Compute_Intensity(LRDL1TelEvent &dl1televent)
 {
-    double mean = TMath::Mean(cleaned_image.begin(), cleaned_image.end());
-    double std = TMath::RMS(cleaned_image.begin(), cleaned_image.end());
+    double mean = TMath::Mean(cleaned_image.begin(), cleaned_image.end(), clean_mask.begin());
+    double std = TMath::RMS(cleaned_image.begin(), cleaned_image.end(), clean_mask.begin());
     std::vector<double> temp(cleaned_image.size());
     std::vector<double> temp2(cleaned_image.size());
 
     std::transform(cleaned_image.begin(), cleaned_image.end(), temp.begin(), [mean, std](double x){return pow((x - mean)/std, 3);});
     std::transform(cleaned_image.begin(), cleaned_image.end(), temp2.begin(), [mean, std](double x){return pow((x - mean)/std, 4);});
-    double skewness = TMath::Mean(temp.begin(), temp.end());
-    double kurtosis = TMath::Mean(temp2.begin(), temp2.end());
+    double skewness = TMath::Mean(temp.begin(), temp.end(), clean_mask.begin());
+    double kurtosis = TMath::Mean(temp2.begin(), temp2.end(), clean_mask.begin());
 
     dl1televent.SetIntensity(mean, std, skewness, kurtosis);
 

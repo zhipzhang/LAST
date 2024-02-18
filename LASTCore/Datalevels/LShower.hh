@@ -20,9 +20,11 @@ class LShower
     int    shower_primary_id;
     int    obs_id;
     int    event_id;
+    double array_point_az;
+    double array_point_alt;
     LShower(){};
     virtual ~LShower(){};
-    ClassDef(LShower, 1)
+    ClassDef(LShower, 2)
 };
 
 class LRShower:public LShower, public TObject
@@ -39,8 +41,6 @@ class LRArray: public LShower, public TObject
         LRArray():LShower(){}
         virtual ~LRArray(){Clear();};
         std::vector<int> trigger_tels;
-        double array_point_az;
-        double array_point_alt;
         void Clear()
         {
             trigger_tels.clear();
@@ -49,9 +49,10 @@ class LRArray: public LShower, public TObject
         {
             trigger_tels.push_back(itel);
         }
+        int GetTrigNums() const {return trigger_tels.size();}
         std::vector<int> GetTelList() {return trigger_tels;}
         int GetEventID() {return event_id;}
-    ClassDef(LRArray, 1);
+    ClassDef(LRArray, 2);
 };
 
 #endif

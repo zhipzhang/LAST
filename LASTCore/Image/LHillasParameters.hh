@@ -37,9 +37,18 @@ class LHillasParameters
         {
             return width;
         }
+        LHillasParameters& ConvertRad(double f)
+        {
+            length = length / f;
+            width = width / f;
+            cog_x = cog_x / f;
+            cog_y = cog_y / f;
+            cog_r = cog_r / f;
+            return *this;
+        }
         LHillasParameters transform_frame(std::pair<double, double> tel_pointing_direction, std::pair<double, double> array_pointing_direction) const;
-        static inline void angles_to_offset(double obj_az, double obj_alt, double az, double alt, double focal_length, double& offset_x, double& offset_y);
-        static inline void offset_to_angles(double offset_x, double offset_y,double az, double alt, double focal_length, double& obj_az, double& obj_alt);
+        static void angles_to_offset(double obj_az, double obj_alt, double az, double alt, double focal_length, double& offset_x, double& offset_y);
+        static void offset_to_angles(double offset_x, double offset_y,double az, double alt, double focal_length, double& obj_az, double& obj_alt);
     private:
         double length;          // length of the main axis  [rad]
         double width;           // length of the minor axis [rad]

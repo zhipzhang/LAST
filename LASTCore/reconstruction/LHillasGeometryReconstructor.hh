@@ -15,13 +15,13 @@ class LHillasGeometryReconstructor
 {
     public:
     LHillasGeometryReconstructor(const LJsonConfig& config): cmd_config(config){};
-    virtual ~LHillasGeometryReconstructor();
+    virtual ~LHillasGeometryReconstructor(){};
     const LJsonConfig& cmd_config;
 
     protected:
-        void SetTelConfig(LDataBase* data)
+        void SetTelConfig(const LDataBase& data)
         {
-            tel_config = data->GetTelescopesConfig();
+            tel_config = data.GetTelescopesConfig();
         }
         double mc_alt;
         double mc_az;

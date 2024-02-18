@@ -2,7 +2,7 @@
 #include "LDL0Event.hh"
 #include "../LJsonConfig.hh"
 #include "../LShower.hh"
-#include "TRandom2.h"
+#include "TRandom3.h"
 
 
 LDL0Event::LDL0Event() :LDataBase()
@@ -47,11 +47,12 @@ void LDL0Event::SetNsbLevel(double i)
 }
 void LDL0Event::SetTrueImage(std::shared_ptr<LRDL0TelEvent> itel, LTelTrueImage* tel_true_image, double nsb_pe)
 {
-    auto rand = new TRandom2();
+    auto rand = new TRandom3();
     itel->Init(tel_true_image->tel_id, tel_true_image->event_id, tel_true_image->tel_alt, tel_true_image->tel_az, tel_true_image->num_pixels);
     for(int i = 0; i < tel_true_image->num_pixels; i++)
     {
         int original_pe = tel_true_image->true_pe[i];
+        double noise = rand->PoissonD(nsb_pe * 1.4);
         double new_pe = original_pe + rand->PoissonD(nsb_pe) - nsb_pe;
         itel->SetTruePixPe(i, new_pe);
     }

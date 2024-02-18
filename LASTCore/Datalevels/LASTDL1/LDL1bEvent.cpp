@@ -5,13 +5,12 @@
 LDL1bEvent::LDL1bEvent()
 {
     ldl1bevent = std::make_shared<LTelescopes<std::shared_ptr<LRDL1bTelEvent>>>();
-    ldl1b_tel_event = new LRDL1bTelEvent();
-    ldl1barrayevent = std::make_shared<LDL1bArrayEvent>();
+    ldl1barrayevent = new LDL1bArrayEvent();
 }
 
 LDL1bEvent::~LDL1bEvent()
 {
-    delete ldl1b_tel_event;
+    delete ldl1barrayevent;
 }
 
 void LDL1bEvent::SetRecCore(double rec_core_x, double rec_core_y, double rec_tiled_x, double rec_tiled_y, double rec_tilted_uncertainty_x, double rec_tilted_uncertainty_y)

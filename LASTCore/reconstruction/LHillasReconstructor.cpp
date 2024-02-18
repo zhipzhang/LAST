@@ -4,7 +4,6 @@
 #include "Image/LHillasParameters.hh"
 #include "TMath.h"
 #include "TMatrixTSparse.h"
-#include "reconstruction/LHillasGeometryReconstructor.hh"
 #include <algorithm>
 #include <memory>
 #include <utility>
@@ -34,6 +33,9 @@ void LHillasReconstructor::SetTiltedPos()
     get_shower_trans_matrix(subarray_pointing_direction.first, subarray_pointing_direction.second, trans);
     for (auto itel: reconstruct_tel)
     {
+        auto x = (*tel_config)[itel]->pos[0];
+        auto y = (*tel_config)[itel]->pos[1];
+        auto z = (*tel_config)[itel]->pos[2];
         double xt, yt;
         xt = trans[0][0] * (*tel_config)[itel]->pos[0] +
              trans[0][1] * (*tel_config)[itel]->pos[1] +
@@ -49,13 +51,16 @@ void LHillasReconstructor::SetTiltedPos()
 bool LHillasReconstructor::ProcessEvent(const LDL1Event& dl1event, LDL1bEvent& dl1bevent)
 {
     hillas_dict.Clear();
+    dl1bevent.Clear();
     SetRecTels(dl1event);
     SetPointing(dl1event);
     SetTiltedPos();
+    dl1bevent.GetEventArrayInfo() = dl1event.GetEventArrayInfo();
     if(reconstruct_tel.size() < 2)
     {
         return false;
     }
+    dl1bevent.SetRecTels(reconstruct_tel);
     for (auto itel: reconstruct_tel)
     {
         hillas_dict.AddTel(itel, dl1event[itel].transform_hillas(tel_pointing_direction[itel], subarray_pointing_direction));
@@ -67,6 +72,11 @@ bool LHillasReconstructor::ProcessEvent(const LDL1Event& dl1event, LDL1bEvent& d
         auto dl1_tel_event = std::make_shared<LRDL1bTelEvent>();
         dl1_tel_event->SetTelHillas(dl1event[itel].GetEventID(), dl1event[itel].GetTelID(), hillas_dict[itel]);
         dl1_tel_event->CopyTelInfo(dl1event[itel]);
+        double impact_distance = ComputeImpactdistance((*tel_config)[itel]->pos, dl1event.GetEventArrayInfo().altitude, dl1event.GetEventArrayInfo().azimuth, dl1event.GetEventArrayInfo().core_x, dl1event.GetEventArrayInfo().core_y);
+        double rec_impact_distance = ComputeImpactdistance((*tel_config)[itel]->pos, dl1bevent.GetRecAlt(), dl1bevent.GetRecAz(), dl1bevent.GetRecCoreX(), dl1bevent.GetRecCoreY());
+        dl1_tel_event->SetImpactParameters(impact_distance, rec_impact_distance);
+        dl1_tel_event->SetShowerInfo(dl1event.GetEventArrayInfo(), dl1event.GetEventArrayInfo().GetTrigNums(), reconstruct_tel.size());
+        dl1bevent.AddTelEvent(itel, dl1_tel_event);
     }
     return true;
     

@@ -48,7 +48,10 @@ class LDL0Event  : public LDataBase
         void SetNsbLevel(double i);
         static void SetTrueImage(std::shared_ptr<LRDL0TelEvent>, LTelTrueImage*, double);
         std::vector<int> GetTelList() const {return dl0array->GetTelList();};
-        std::shared_ptr<LRDL0TelEvent> GetTelEvent(int tel_id) const {return (*dl0event)[tel_id];};
+        const LRDL0TelEvent& GetTelEvent(int tel_id) const {return *((*dl0event)[tel_id]);};
+        const LRDL0TelEvent& operator[]  (int tel_id) const {return *((*dl0event)[tel_id]);};
+        LShower& GetShowerInfo() {return *dl0array;};
+        const LShower& GetShowerInfo() const {return *dl0array;};
 };
 
 class Ldl0Event

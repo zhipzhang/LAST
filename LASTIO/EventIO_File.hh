@@ -65,6 +65,14 @@ class EventIO_Object {
   std::vector<long> item_start_offset; // Offset for the data field
 
  public:
+     static bool endsWith(const std::string& str, const std::string& suffix) {
+        if (str.length() >= suffix.length()) {
+        return (0 == str.compare(str.length() - suffix.length(), suffix.length(), suffix));
+        } 
+        else {
+            return false;
+        }
+        }
   EventIO_Object(string filename, unsigned long max_length);
   EventIO_Object(string filename, unsigned long max_length,
                  std::string remote_url);

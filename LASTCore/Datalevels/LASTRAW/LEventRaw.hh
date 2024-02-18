@@ -34,6 +34,7 @@ class LEventRaw : public LDataBase{
         void GetEvent();                  // Get the event from the hsdata. (including the shower data/true_image/waveform)
         virtual bool ReadEvent();     // Read the event from the tree.
         std::shared_ptr<LEvent> EventAddress(){return event;};
+        bool HaveWaveform = false;
     protected:
         LAST_IO::SimTelIO* simtel_file;  // Main Class to open the eventio File;
 

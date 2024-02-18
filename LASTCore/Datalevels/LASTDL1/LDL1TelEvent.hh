@@ -38,8 +38,8 @@ class LRDL1TelEvent : public TObject
     public:
     double tel_alt;
     double tel_az;
-        LRDL1TelEvent(){}
-        LRDL1TelEvent(int tel_id, int event_id)
+    LRDL1TelEvent(){}
+    LRDL1TelEvent(int tel_id, int event_id)
         {
             this->tel_id = tel_id;
             this->event_id = event_id;
@@ -127,7 +127,28 @@ class LRDL1TelEvent : public TObject
         this->concentration_core = dl1_tel_event.concentration_core;
         this->concentration_pixel = dl1_tel_event.concentration_pixel;
     }
-    ClassDef(LRDL1TelEvent, 1)
+    double GetSize() const
+    {
+        return hillas.GetSize();
+    }
+    double GetWidth() const
+    {
+        return hillas.GetWidth();
+    }
+    double GetLeakage1() const
+    {
+        return leakage1;
+    }
+    double GetLeakage2() const
+    {
+        return leakage2;
+    }
+    void SetTelPointing(double tel_alt, double tel_az)
+    {
+        this->tel_alt = tel_alt;
+        this->tel_az = tel_az;
+    }
+    ClassDef(LRDL1TelEvent, 2)
 
 };
 

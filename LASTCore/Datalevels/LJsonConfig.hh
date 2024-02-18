@@ -26,13 +26,38 @@ struct DataWriterinfo
 
 struct LQualityCheck
 {
-    double min_size;
+    double min_size = -1;
     double min_width  = 0;
     int    min_n_pixels = -1;
     double max_leakage1 = -1;
     double max_leakage2 = -1;
-    bool   CheckImageprocess();
-    int  CheckReconstructTel(const LRDL1TelEvent& dl1televent);
+    //bool   CheckImageprocess();
+    int  CheckReconstructTel(const LRDL1TelEvent& dl1televent)
+    {
+        if(min_size > 0)
+        {
+            if(dl1televent.GetSize() < min_size)
+            {
+                return 0;
+            }
+        }
+        if(dl1televent.GetWidth() < min_width)
+        {
+            return 0;
+        }
+        
+        if(max_leakage1 > 0 && dl1televent.GetLeakage1() > max_leakage1)
+        {
+            return 0;
+        }
+        if(max_leakage2 > 0 && dl1televent.GetLeakage2() > max_leakage2)
+        {
+            return 0;
+        }
+        return 1;
+    }
+    LQualityCheck(){};
+    ~LQualityCheck(){};
 
 
 };
@@ -46,11 +71,13 @@ class LJsonConfig
     DataWriterinfo* writer_info;
     LQualityCheck* quality_check;
     const std::vector<std::string> clean_methods{"TailCutsCleaner", "MARSCleaner"};
+    bool StoreWaveform = false;
     public:
         LJsonConfig(int argc, char** argv)
         {
             ParseCommandLineFlags(argc, argv);
             ReadConfiguration();
+            quality_check = new LQualityCheck();
         }
         ~LJsonConfig(){};
         void ParseCommandLineFlags(int argc, char** argv);
@@ -79,7 +106,10 @@ class LJsonConfig
         {
             return writer_info->remote_url;
         }
-
+        bool WriteWaveform() const
+        {
+            return StoreWaveform;
+        }
 
 };
 

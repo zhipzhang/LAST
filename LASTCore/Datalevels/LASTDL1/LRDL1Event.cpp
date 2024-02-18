@@ -9,7 +9,7 @@ LRDL1Event::LRDL1Event(const LJsonConfig& cfg, const char mode): cmd_config(cfg)
     ldl1array = new LRArray();
     if(mode == 'r')
     {
-        
+        ReadROOTFile(cmd_config.GetInputFileName());
     }
     if( mode == 'w')
     {

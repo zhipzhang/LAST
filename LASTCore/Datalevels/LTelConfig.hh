@@ -38,7 +38,7 @@ class LRTelescopeConfig : public TObject
     TString camera_name;
     Double32_t pix_size;
     int pix_shape;
-    //std::unique_ptr<LOptics>    optics;
+    Double32_t focal_length;
     void SetTelPos(double x, double y, double z)
     {
         pos[0] = x;
@@ -47,6 +47,6 @@ class LRTelescopeConfig : public TObject
     }
     void InitCameraSet(std::string, int , int);
     //void InitOptics(std::string, int);
-    ClassDef(LRTelescopeConfig, 5)
+    ClassDef(LRTelescopeConfig, 6)
 };
 #endif

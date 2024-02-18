@@ -3,6 +3,7 @@
 #include "XrdCl/XrdClFile.hh"
 #include "XrdCl/XrdClFileSystem.hh"
 #include "XrdCl/XrdClXRootDResponses.hh"
+#include "XroodCompressd_File.hh"
 #include "glog/logging.h"
 #include "initial.h"
 #include <byteswap.h>
@@ -37,7 +38,14 @@ LAST_IO::EventIO_Object::EventIO_Object(std::string filename, unsigned long leng
 {
   LOG(INFO) << "Working at eos file system , Xrootd File Initialized";
   filename += remote_url;
-  input_file  = new XrdFile(filename);
+  if(endsWith(filename, ".zstd"))
+  {
+    LOG(INFO) << "File is compressed with zstd";
+    input_file = new CXrdFile_Zst(filename);
+  }
+  else {
+    input_file  = new XrdFile(filename);
+  }
   item_header = new HEADER();
   int len = 10000;
   sub_item_header = new HEADER();

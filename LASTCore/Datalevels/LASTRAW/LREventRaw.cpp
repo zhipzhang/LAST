@@ -13,16 +13,21 @@ LREventRaw::LREventRaw(const LJsonConfig& cmd_config, const char mode): LEventRa
         input_fname = cmd_config.GetInputFileName();
         if( input_fname.compare(0, 4, "/eos") == 0)
         {
-            simtel_file = new LAST_IO::SimTelIO(input_fname, cmd_config.GetMaxIOLength(), cmd_config.GetUrl());
+                simtel_file = new LAST_IO::SimTelIO(input_fname, cmd_config.GetMaxIOLength(), cmd_config.GetUrl());
         }
         else 
         {
             simtel_file = new LAST_IO::SimTelIO(input_fname, cmd_config.GetMaxIOLength());
         }
+        InitRootFile();
     }
     if( mode == 'r')
     {
         ReadROOTFile(cmd_config.GetInputFileName());
+    }
+    if(!cmd_config.WriteWaveform())
+    {
+        waveform_tree->SetBranchStatus("*", 0);
     }
 }
 
@@ -49,6 +54,10 @@ void LREventRaw::InitRootFile()
 bool LREventRaw::HandleEvent()
 {
     bool flag = ProcessEvent();
+    if( !flag)
+    {
+        return flag;
+    }
     GetEvent();
     for( const auto itel: event->GetImageTelList())
     {
@@ -73,7 +82,8 @@ void LREventRaw::StoreTTree()
     ReadRunConfig();
     ReadTelConfig();
     true_image_tree->BuildIndex("event_id", "tel_id");
-    waveform_tree->BuildIndex("event_id", "tel_id");
+    if( cmd_config.WriteWaveform())
+        waveform_tree->BuildIndex("event_id", "tel_id");
     WriteConfig(rootfile.get());
     event_dir->cd();
     true_image_tree->Write();
@@ -121,14 +131,19 @@ bool LREventRaw::ReadEvent()
         {
             auto flag_true = true_image_tree->GetEntryWithIndex(event_id, itel);
             auto flag_wave = waveform_tree->GetEntryWithIndex(event_id, itel);
-            if (flag_true == -1 || flag_wave == -1)
+            if (flag_true == -1)
             {
                 LOG(ERROR) << "Can't find the event " << event_id << " in telescope " << itel;
                 return false;
             }
 
             event->AddTelImage(itel, rtel_true_image);
-            event->AddTelWaveform(itel, rtel_electronic);
+            if( flag_wave != -1)
+            {    
+                event->AddTelWaveform(itel, rtel_electronic);
+                HaveWaveform = true;
+            }
+
         }
         return true;
 

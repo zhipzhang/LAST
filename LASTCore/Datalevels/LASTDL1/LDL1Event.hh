@@ -23,6 +23,8 @@ class LDL1Event : public LDataBase
         std::vector<int> GetTelList() const {return ldl1array->GetTelList();};
         double GetPointingAz() const {return ldl1array->array_point_az;};
         double GetPointingAlt() const {return ldl1array->array_point_alt;};
+        const LRArray& GetEventArrayInfo() const {return *ldl1array;};
+        LShower& GetEventArrayInfo() {return *ldl1array;};
     protected:
         std::shared_ptr<LTelescopes<std::shared_ptr<LRDL1TelEvent>>> ldl1event;
         LRDL1TelEvent* dl1_tel_event;

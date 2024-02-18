@@ -19,6 +19,7 @@ class LDL1bArrayEvent: public LRArray
     public:
 
     bool       Isvalid = false;
+    std::vector<int> reconstruction_tels;
     Double32_t hillas_alt;
     Double32_t hillas_az;
     Double32_t hillas_alt_uncertainty;
@@ -32,7 +33,15 @@ class LDL1bArrayEvent: public LRArray
     Double32_t avearge_intensity;
     Double32_t hillas_hmax;
     Double32_t hillas_hmax_uncertainty;
-
+    void Reset()
+    {
+        Isvalid = false;
+        reconstruction_tels.clear();
+    }
+    void SetRecTels(std::vector<int> rec_tels)
+    {
+        reconstruction_tels = rec_tels;
+    }
     ClassDef(LDL1bArrayEvent, 1)
 };
 

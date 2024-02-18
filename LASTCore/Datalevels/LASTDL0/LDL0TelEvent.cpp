@@ -6,10 +6,16 @@ LRDL0TelEvent::LRDL0TelEvent()
 
 LRDL0TelEvent::~LRDL0TelEvent()
 {
-    if( num_pixels >0)
+    if( true_image_pe)
     {
     delete[] true_image_pe;
+    }
+    if( pix_pe)
+    {
     delete[] pix_pe;
+    }
+    if( pix_time)
+    {
     delete[] pix_time;
     }
 }

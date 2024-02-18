@@ -1,4 +1,7 @@
+#include "Datalevels/LASTDL1/LDL1TelEvent.hh"
 #include "Datalevels/LASTDL1/LDL1bEvent.hh"
+#include "Datalevels/LDataBase.hh"
+#include "Datalevels/LShower.hh"
 #include "Datalevels/LTelescopesTemplate.hh"
 #include <unordered_map>
 #include <utility>
@@ -13,8 +16,12 @@ class  LHillasReconstructor: public LHillasGeometryReconstructor
     public: 
         LHillasReconstructor();
         LHillasReconstructor(const LJsonConfig& config): LHillasGeometryReconstructor(config){};
-        virtual ~LHillasReconstructor();
+        virtual ~LHillasReconstructor(){};
         bool ProcessEvent(const LDL1Event& dl1event, LDL1bEvent& dl1bevent);                            // process the event
+        void Init(const LDataBase& dl1event)
+        {
+            SetTelConfig(dl1event);
+        }
     private:
         void SetRecTels(const LDL1Event& dl1event);
         void SetPointing(const LDL1Event& dl1event)
@@ -30,6 +37,7 @@ class  LHillasReconstructor: public LHillasGeometryReconstructor
         LTelescopes<LHillasParameters> hillas_dict;
         void Direction_Reconstruction(LDL1bEvent& ldl1bevent);
         void Core_Reconstruction(LDL1bEvent& ldl1bevent);
+        void SetImpactParameters(LRDL1TelEvent& ldl1btelevent, const LShower& shower);
         double trans[3][3];
         static  inline int intersect_lines (double xp1, double yp1, double phi1,
         double xp2, double yp2, double phi2, double *xs, double *ys, double *sang)

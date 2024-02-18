@@ -21,7 +21,7 @@ class LRDL0TelEvent :public TObject
         LRDL0TelEvent();
         virtual ~LRDL0TelEvent();
         void SetWaveForm(bool flag) {have_waveform_pe = flag;};
-        void Init(int tel_id, int event_id, int tel_alt, int tel_az, int num_pixels)
+        void Init(int tel_id, int event_id, Double32_t tel_alt, Double32_t tel_az, int num_pixels)
             {
                 this->event_id = event_id;
                 this->tel_alt = tel_alt;
@@ -30,7 +30,8 @@ class LRDL0TelEvent :public TObject
                 this->num_pixels = num_pixels;
                 true_image_pe = new Double32_t[num_pixels];
                 pix_pe = new Double32_t[num_pixels];
-                pix_time = new Double32_t[num_pixels];
+                std::fill(pix_pe, pix_pe + num_pixels, 0);
+                pix_time = new Double32_t[num_pixels]{0};
             };
         void SetTruePixPe(int ipix, Double32_t true_pe)
         {
@@ -48,18 +49,27 @@ class LRDL0TelEvent :public TObject
         {
             return event_id;
         }
+        Double32_t GetTelAlt() const
+        {
+            return tel_alt;
+        }
+        Double32_t GetTelAz() const
+        {
+            return tel_az;
+        }
         LRDL0TelEvent& operator=(const LRDL0TelEvent& rhs);
     private:
         int tel_id;
         int event_id;
-        int tel_alt;
-        int tel_az;
+        Double32_t tel_alt;
+        Double32_t tel_az;       
+
         bool have_waveform_pe = false;
         int num_pixels;
         Double32_t* true_image_pe = nullptr; // [num_pixels] Adding the NSB here.
         Double32_t* pix_pe = nullptr;        // [num_pixels] Get from the waveform.
         Double32_t* pix_time = nullptr;    // [num_pixels] Get from the waveform.
-    ClassDef(LRDL0TelEvent, 1)
+    ClassDef(LRDL0TelEvent, 2)
  };
 
 

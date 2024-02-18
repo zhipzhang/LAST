@@ -48,6 +48,7 @@ class LImageProcessor
         static LHillasParameters Compute_Hillas(const LCameraGeometry& geom, const std::vector<double>& cleaned_image);
         static void Compute_Morphology(const LCameraGeometry& geom, const std::vector<double>& cleaned_image, const std::vector<bool>& mask, std::vector<double>& island_size, std::vector<std::vector<int>>& island_labels);
         LCameraGeometry* tel_geometry;
+        double focal_length;
         
 };
 

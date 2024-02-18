@@ -85,6 +85,7 @@ void LEventRaw::GetConfig(AllHessData* hsdata)
         double pixel_size = hsdata->camera_set[i].size[0];
         tel_config->pix_shape = pixel_shape;
         tel_config->pix_size = pixel_size;
+        tel_config->focal_length = hsdata->camera_set[i].flen;
         this->tel_config->AddTel(tel_id, tel_config);
     }
 
@@ -269,12 +270,27 @@ void LEvent::GetTrueImage( AllHessData *hsdata)
         tel_true_image->tel_id = tel_id;
         tel_true_image->num_pixels = hsdata->mc_event.mc_pe_list[tel_id - 1].pixels;
         tel_true_image->Allocate();
-        tel_true_image->tel_alt = hsdata->event.trackdata[tel_id - 1].altitude_raw;
-        tel_true_image->tel_az = hsdata->event.trackdata[tel_id - 1].azimuth_raw;
+        if(hsdata->event.trackdata[tel_id - 1].raw_known )
+        {
+            tel_true_image->tel_alt = hsdata->event.trackdata[tel_id - 1].altitude_raw;
+            tel_true_image->tel_az = hsdata->event.trackdata[tel_id - 1].azimuth_raw;
+        }
+        else 
+        {
+            tel_true_image->tel_alt = hsdata->run_header.direction[1];
+            tel_true_image->tel_az = hsdata->run_header.direction[0];
+        }
         for(auto ipix = 0; ipix < tel_true_image->num_pixels; ipix++)
         {
             tel_true_image->true_pe[ipix] = hsdata->mc_event.mc_pe_list[tel_id - 1].pe_count[ipix];
         }
+        tel_true_image->Allocate_Pe(hsdata->mc_event.mc_pe_list[tel_id - 1].npe);
+        for(int ipe = 0; ipe < hsdata->mc_event.mc_pe_list[tel_id - 1].npe; ipe++)
+        {
+            tel_true_image->pe_time[ipe] = hsdata->mc_event.mc_pe_list[tel_id - 1].atimes[ipe];
+            tel_true_image->pe_intensity[ipe] = hsdata->mc_event.mc_pe_list[tel_id - 1].amplitudes[ipe];
+        }
+        tel_true_image->Compute_Spread();
         simulation_image->telescopes_true_image->AddTel(tel_id, tel_true_image);
         event_shower->AddTel(tel_id);
     }

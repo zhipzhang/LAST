@@ -8,7 +8,6 @@ int main(int argc, char** argv)
     google::SetStderrLogging(google::GLOG_INFO);
     LJsonConfig config(argc, argv);
     LREventRaw* event_raw = new LREventRaw(config);
-    event_raw->InitRootFile();
     while(event_raw->HandleEvent())
     {
     }

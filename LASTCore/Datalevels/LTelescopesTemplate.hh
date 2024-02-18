@@ -22,7 +22,7 @@ class LTelescopes
             Clear();
         }
         int GetTelNum() const {return telescope_id.size();};
-        void AddTel(int tel_id, LTel tel) {std::cout << "Adding Element Tel id " << tel_id << std::endl;telescopes_dict[tel_id] = tel; telescope_id.push_back(tel_id);};
+        void AddTel(int tel_id, LTel tel) {telescopes_dict[tel_id] = tel; telescope_id.push_back(tel_id);};
         void DeleteTel(int tel_id, int i){ telescopes_dict.erase(tel_id); telescope_id.erase(telescope_id.begin() + i);};
         std::vector<int> GetKeys() const {return telescope_id; };
         void Clear() 
