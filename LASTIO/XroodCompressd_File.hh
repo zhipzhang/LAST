@@ -11,7 +11,6 @@
 #ifndef _XrootdCompressed_File__H
 #define _XrootdCompressed_File__H
 #include "Base_File.hh"
-#include "EventIO_File.hh"
 #include "LAST_types.hh"
 #include <cstddef>
 #include <cstring>
@@ -26,62 +25,79 @@ class CXrdFile_Zst : public XrdFile {
     buf_offset = 0;
     buf_remaining = 0;
     file_type = 3;
+    input = {buffIn, bufferInSize, 0};
+    output = {buffout, bufferOutSize, 0};
   }
   ~CXrdFile_Zst() {
     delete[] buffIn;
     delete[] buffout;
   }
-  LASTByteNum read(LASTByteNum size, BYTE *buffer) override{
-    have_read = 0;
-    while( (size - have_read) >= buf_remaining)
+  void ReadInputBuffer()
+  {
+    LASTByteNum rc;
+    if((rc = XrdFile::read(bufferInSize, (BYTE*)buffIn)) != bufferInSize)
     {
-      LASTByteNum rc;
-      if((rc = XrdFile::read(bufferInSize, (BYTE*)buffIn)) != bufferInSize)
+      LOG(ERROR) << "Error in Reading";
+    }
+  }
+  void DeCompress()
+  {
+    if(buf_remaining == 0)
+    {
+      if(input.pos == input.size)
       {
-        return 0;
+        ReadInputBuffer();
+        DeCompress();
       }
-      input = {buffIn, bufferInSize, 0};
-      while(input.pos < input.size)
+      else 
       {
-        output = {buffout, bufferOutSize, 0};
         const size_t ret= ZSTD_decompressStream(ZSTD_DStream, &output, &input);
         if(ZSTD_isError(ret))
         {
           LOG(ERROR) << "Error in decompressing the zstd file";
-          return 0;
+          return;
         }
-        memcpy(buffer + have_read, buffout, output.pos);
-        have_read += output.pos;
+        buf_remaining = output.pos;
+        offset = 0;
       }
-      buf_offset = 0;
     }
-    memcpy(buffer + have_read, buffout + buf_offset, buf_remaining - (size - have_read));
-    have_read += size - have_read;
+  }
+  LASTByteNum read(LASTByteNum size, BYTE *buffer) override{
+    have_read = 0;
+    DeCompress();
+    if(buf_remaining >= size)
+    {
+      memcpy(buffer, buffout + buf_offset, size);
+      buf_offset += size;
+      buf_remaining -= size;
+      have_read = size;
+      return have_read;
+    }
+    else 
+    {
+      memcpy(buffer, buffout + buf_offset, buf_remaining);
+      have_read += buf_remaining;
+      buf_remaining = 0;
+      size -= buf_remaining;
+      have_read += read(size, buffer + buf_remaining);
+    }
     return have_read;
+
   }
     void seek_cur(LASTFileOffset offset) override {
-      while(offset > buf_remaining)
+      DeCompress();
+      if(buf_remaining >= offset)
+      {
+        buf_offset += offset;
+        buf_remaining -= offset;
+      }
+      else 
       {
         offset -= buf_remaining;
         buf_remaining = 0;
         buf_offset = 0;
-        XrdFile::read(bufferInSize, (BYTE*)buffIn);
-        input = {buffIn, bufferInSize, 0};
-        while(input.pos < input.size)
-        {
-          output = {buffout, bufferOutSize, 0};
-          const size_t ret= ZSTD_decompressStream(ZSTD_DStream, &output, &input);
-          if(ZSTD_isError(ret))
-          {
-            LOG(ERROR) << "Error in decompressing the zstd file";
-            return;
-          }
-          buf_remaining = output.pos;
-        }
-        buf_offset = 0;
+        XrdFile::seek_cur(offset);
       }
-      buf_remaining -= offset;
-      buf_offset += offset;
     }
 
 
