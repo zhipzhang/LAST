@@ -27,6 +27,7 @@ class CXrdFile_Zst : public XrdFile {
     file_type = 3;
     input = {buffIn, bufferInSize, 0};
     output = {buffout, bufferOutSize, 0};
+    ReadInputBuffer();
   }
   ~CXrdFile_Zst() {
     delete[] buffIn;
@@ -37,34 +38,44 @@ class CXrdFile_Zst : public XrdFile {
     LASTByteNum rc;
     if((rc = XrdFile::read(bufferInSize, (BYTE*)buffIn)) != bufferInSize)
     {
-      LOG(ERROR) << "Error in Reading";
+      LOG(ERROR) << "Error in Reading, Maybe End of File";
     }
+    input = {buffIn, rc, 0};
   }
-  void DeCompress()
+  bool GetOutputBuff()
   {
-    if(buf_remaining == 0)
+    output = {buffout, bufferOutSize, 0};
+    const size_t ret= ZSTD_decompressStream(ZSTD_DStream, &output, &input);
+        if(ZSTD_isError(ret))
+        {
+          LOG(ERROR) << "Error in decompressing the zstd file";
+          return false;
+        }
+    buf_remaining = output.pos;
+    buf_offset = 0;
+    return true;
+  }
+  bool  DeCompress()
+  {
+    bool flag = true;
+    while(buf_remaining == 0 && flag)
     {
       if(input.pos == input.size)
       {
         ReadInputBuffer();
-        DeCompress();
+        flag = GetOutputBuff();
       }
       else 
       {
-        const size_t ret= ZSTD_decompressStream(ZSTD_DStream, &output, &input);
-        if(ZSTD_isError(ret))
-        {
-          LOG(ERROR) << "Error in decompressing the zstd file";
-          return;
-        }
-        buf_remaining = output.pos;
-        offset = 0;
+        flag = GetOutputBuff();
       }
     }
+    return flag;
   }
   LASTByteNum read(LASTByteNum size, BYTE *buffer) override{
-    have_read = 0;
-    DeCompress();
+    bool flag = true;
+    LASTByteNum have_read = 0;
+    flag = DeCompress();
     if(buf_remaining >= size)
     {
       memcpy(buffer, buffout + buf_offset, size);
@@ -75,11 +86,17 @@ class CXrdFile_Zst : public XrdFile {
     }
     else 
     {
+      int offset = 0;
       memcpy(buffer, buffout + buf_offset, buf_remaining);
+      buf_offset += buf_remaining;
+      offset = buf_remaining;
       have_read += buf_remaining;
-      buf_remaining = 0;
       size -= buf_remaining;
-      have_read += read(size, buffer + buf_remaining);
+      buf_remaining = 0;
+      if(flag)
+        have_read += read(size, buffer + offset);
+      else
+        return 0;
     }
     return have_read;
 
@@ -96,7 +113,7 @@ class CXrdFile_Zst : public XrdFile {
         offset -= buf_remaining;
         buf_remaining = 0;
         buf_offset = 0;
-        XrdFile::seek_cur(offset);
+        seek_cur(offset);
       }
     }
 
@@ -109,7 +126,6 @@ class CXrdFile_Zst : public XrdFile {
     char* buffout;
     LASTByteNum   buf_offset;
     LASTByteNum   buf_remaining;
-    LASTByteNum   have_read;
     ZSTD_inBuffer input;
     ZSTD_outBuffer output;
     ZSTD_DCtx* ZSTD_DStream  = ZSTD_createDCtx();

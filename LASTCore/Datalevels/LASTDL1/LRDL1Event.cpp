@@ -9,7 +9,7 @@ LRDL1Event::LRDL1Event(const LJsonConfig& cfg, const char mode): cmd_config(cfg)
     ldl1array = new LRArray();
     if(mode == 'r')
     {
-        ReadROOTFile(cmd_config.GetInputFileName());
+        ReadROOTFile(cmd_config.GetUrl() +cmd_config.GetInputFileName());
     }
     if( mode == 'w')
     {
@@ -20,7 +20,7 @@ void LRDL1Event::InitRootFile()
 {
     if(outname.empty())
     {
-        outname = cmd_config.GetOutputFileName();
+        outname = cmd_config.GetUrl() + cmd_config.GetOutputFileName();
     }
     root_file.reset(TFile::Open(outname.c_str(), "RECREATE"));
     dl1_dir = root_file->mkdir(dl1_dirname);

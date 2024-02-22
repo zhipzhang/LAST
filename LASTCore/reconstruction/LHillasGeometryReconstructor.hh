@@ -17,6 +17,13 @@ class LHillasGeometryReconstructor
     LHillasGeometryReconstructor(const LJsonConfig& config): cmd_config(config){};
     virtual ~LHillasGeometryReconstructor(){};
     const LJsonConfig& cmd_config;
+    static inline double ComputeImpactdistance(double* tel_pos, double altitude, double azimuth, double x, double y)
+        {
+            double cx = cos(altitude)*cos(azimuth);
+            double cy = -cos(altitude)*sin(azimuth);
+            double cz = sin(altitude);
+            return line_point_distance(x, y, 0, cx, cy, cz, tel_pos[0], tel_pos[1], tel_pos[2]);
+        }
 
     protected:
         void SetTelConfig(const LDataBase& data)
@@ -37,13 +44,6 @@ class LHillasGeometryReconstructor
         {
             MCxcore = x;
             MCycore = y;
-        }
-        static inline double ComputeImpactdistance(double* tel_pos, double altitude, double azimuth, double x, double y)
-        {
-            double cx = cos(altitude)*cos(azimuth);
-            double cy = -cos(altitude)*sin(azimuth);
-            double cz = sin(altitude);
-            return line_point_distance(x, y, 0, cx, cy, cz, tel_pos[0], tel_pos[1], tel_pos[2]);
         }
         static inline double line_point_distance (double xp1, double yp1, double zp1, 
                     double cx, double cy, double cz,

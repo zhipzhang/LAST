@@ -6,29 +6,41 @@
 #include "LREventRaw.hh"
 #include <memory>
 
-LREventRaw::LREventRaw(const LJsonConfig& cmd_config, const char mode): LEventRaw(), cmd_config(cmd_config)
+LREventRaw::LREventRaw(const LJsonConfig& cmd_config, const char mode): cmd_config(cmd_config),LEventRaw()
 {
-    if( mode == 'w')
+    input_fname = cmd_config.GetInputFileName();
+    if( mode == 'w' || mode == 't')
     {
-        input_fname = cmd_config.GetInputFileName();
-        if( input_fname.compare(0, 4, "/eos") == 0)
+        if(input_fname.compare(0, 4, "/eos") == 0)
         {
-                simtel_file = new LAST_IO::SimTelIO(input_fname, cmd_config.GetMaxIOLength(), cmd_config.GetUrl());
+            simtel_file = new LAST_IO::SimTelIO(input_fname, cmd_config.GetMaxIOLength(), cmd_config.GetUrl());
         }
         else 
         {
             simtel_file = new LAST_IO::SimTelIO(input_fname, cmd_config.GetMaxIOLength());
         }
-        InitRootFile();
+        if( mode == 'w')
+        {
+            InitRootFile();
+            if(!cmd_config.WriteWaveform())
+            {
+                waveform_tree->SetBranchStatus("*", 0);
+            }
+        }
     }
     if( mode == 'r')
     {
         ReadROOTFile(cmd_config.GetInputFileName());
     }
-    if(!cmd_config.WriteWaveform())
+}
+LREventRaw::LREventRaw(const LJsonConfig& cmd_config, std::string filename): cmd_config(cmd_config),LEventRaw()
+{
+    input_fname = filename;
+    if(input_fname.compare(0, 4, "/eos") == 0)
     {
-        waveform_tree->SetBranchStatus("*", 0);
+        input_fname = cmd_config.GetUrl() + input_fname;
     }
+    ReadROOTFile(input_fname);
 }
 
 void LREventRaw::InitRootFile()
@@ -36,6 +48,10 @@ void LREventRaw::InitRootFile()
     if( output_fname.empty())
     {
         output_fname = cmd_config.GetOutputFileName();
+        if(output_fname.compare(0, 4, "/eos") == 0)
+        {
+            output_fname = cmd_config.GetUrl() + output_fname;
+        }
     }
     rootfile.reset(TFile::Open(output_fname.c_str(), "RECREATE"));
     simulation_dir = rootfile->mkdir("simulation");

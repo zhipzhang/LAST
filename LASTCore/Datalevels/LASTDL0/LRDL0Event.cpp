@@ -5,7 +5,7 @@ LRDL0Event::LRDL0Event(const LJsonConfig& config, const char mode): cmd_config(c
 {
     if(mode == 'r')
     {
-        ReadROOTFile(config.GetInputFileName());   
+        ReadROOTFile(cmd_config.GetUrl() + config.GetInputFileName());   
     }
     if( mode == 'w')
     {
@@ -17,6 +17,10 @@ void LRDL0Event::InitRootFile()
     if(outname.empty())
     {
         outname = cmd_config.GetOutputFileName();
+    }
+    if(outname.compare(0, 4, "/eos") == 0)
+    {
+        outname = cmd_config.GetUrl() + outname;
     }
     root_file.reset(TFile::Open(outname.c_str(), "RECREATE"));
     dl0_dir = root_file->mkdir(dl0_dirname);

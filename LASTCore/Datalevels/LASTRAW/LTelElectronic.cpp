@@ -14,7 +14,6 @@ LTelElectronic::LTelElectronic()
 }
 LTelElectronic::~LTelElectronic()
 {
-    LOG(INFO) << "delete LTelElectronic";
     if( adc_sample)
     {
         delete[] adc_sample;

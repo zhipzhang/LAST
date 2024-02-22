@@ -17,6 +17,8 @@ class LREventRaw : public LEventRaw
 {
     public:
         LREventRaw(const LJsonConfig& cmd_config, const char mode = 'w');
+
+        LREventRaw(const LJsonConfig& cmd_config, std::string filename); // Read File When Analysis Constructor.
         virtual ~LREventRaw();
 
         void InitRootFile();   // Open the root file and create the directory and tree.
