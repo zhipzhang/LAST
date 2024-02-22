@@ -25,9 +25,9 @@ void LRDL0Event::InitRootFile()
     root_file.reset(TFile::Open(outname.c_str(), "RECREATE"));
     dl0_dir = root_file->mkdir(dl0_dirname);
     dl0_dir->cd();
-    dl0event_tree = new TTree("dl0event", "dl0event");
+    dl0event_tree = new TTree("dl0event", "dl0event", 99, dl0_dir);
     dl0event_tree->Branch("dl0_tel_event", &dl0_tel_event);
-    arrayevent = new TTree("arrayevent", "arrayevent");
+    arrayevent = new TTree("arrayevent", "arrayevent", 99, dl0_dir);
     arrayevent->Branch("arrayevent", &dl0array);
 }
 void LRDL0Event::HandleEvent()

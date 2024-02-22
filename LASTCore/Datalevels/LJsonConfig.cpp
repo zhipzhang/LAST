@@ -13,8 +13,10 @@ void LJsonConfig::ParseCommandLineFlags(int argc, char **argv)
     json_fname = FLAGS_json_path;
     output_fname = FLAGS_output_file;
     input_fname = FLAGS_input_file; // keep the one file interface
-    input_fnames = splitString(FLAGS_input_file, ',');
-    only_telescopes = splitStringToInt(FLAGS_only_telescope, ',');
+    if(input_fname.find(',') != std::string::npos)
+        input_fnames = splitString(FLAGS_input_file, ',');
+    if(FLAGS_only_telescope != "")
+        only_telescopes = splitStringToInt(FLAGS_only_telescope, ',');
 }
 
 void LJsonConfig::ReadConfiguration()
