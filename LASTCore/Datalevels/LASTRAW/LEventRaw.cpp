@@ -5,44 +5,12 @@
 #include "../LTelConfig.hh"
 #include "LEventElectronic.hh"
 
-LEventRaw::LEventRaw()
+LEventRaw::LEventRaw():LDataBase()
 {
     InitObject();
 }
-/*
-LEventRaw::LEventRaw(const LJsonConfig& config, const char mode ):cmd_config(config), LDataBase()
-{
-    if( mode == 'w')
-    {
-        input_fname = cmd_config.GetInputFileName();
-        if( input_fname.compare(0, 4, "/eos") == 0)
-        {
-            simtel_file = new LAST_IO::SimTelIO(input_fname, cmd_config.GetMaxIOLength(), cmd_config.GetUrl());
-        }
-        simtel_file = new LAST_IO::SimTelIO(input_fname, cmd_config.GetMaxIOLength());
-        InitObject();
-    }
-    if( mode == 'w')
-    {
-        InitObject();
-        
-    }
-};
-LEventRaw::LEventRaw(const LJsonConfig& config, bool write):cmd_config(config), LDataBase()
-{
-    InitObject();
 
-};
-*/
-/*
-LEventRaw::LEventRaw(std::string input_fname): LDataBase()
-{
-    this->input_fname = input_fname;
-    //simtel_file = std::make_unique<LAST_IO::SimTelIO>(input_fname, 100000000);
-    simtel_file = new LAST_IO::SimTelIO(input_fname, 100000000);
-    InitObject();
-};
-*/
+
 void LEventRaw::InitObject()
 {
     event = std::make_shared<LEvent>();

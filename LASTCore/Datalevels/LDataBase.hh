@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <memory>
+#include <utility>
 
 class LDataBase
 {
@@ -33,6 +34,8 @@ class LDataBase
         virtual ~LDataBase();
         void Read(TFile* f);               // Read the data from ROOT file
         std::shared_ptr<LTelescopes<std::shared_ptr<LRTelescopeConfig>>> GetTelescopesConfig() const {return tel_config;};
+        std::pair<double, double> GetTelGroundPos(int tel_id) const {return std::make_pair((*tel_config)[tel_id]->pos[0], (*tel_config)[tel_id]->pos[1]);};
+
     protected:
         std::unique_ptr<LRShower> shower;    // shower data
         LRSimulationRunConfig* run_config; // run configuration

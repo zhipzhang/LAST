@@ -18,7 +18,7 @@ class LSimulationImage
 {
     public:
         LSimulationImage(){ telescopes_true_image = std::make_shared<LTelescopes<std::shared_ptr<LRTelTrueImage>>>();};
-        ~LSimulationImage(){LOG(INFO) << "delete Lsimulation Image";};
+        ~LSimulationImage(){};
         void Clear(){telescopes_true_image->Clear();};
         std::shared_ptr<LTelescopes<std::shared_ptr<LRTelTrueImage>>> GetData() {return telescopes_true_image;}
         const std::vector<int> GetTelList(){return telescopes_true_image->GetKeys();}

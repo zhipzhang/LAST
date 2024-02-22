@@ -17,6 +17,8 @@ class LREventRaw : public LEventRaw
 {
     public:
         LREventRaw(const LJsonConfig& cmd_config, const char mode = 'w');
+
+        LREventRaw(const LJsonConfig& cmd_config, std::string filename); // Read File When Analysis Constructor.
         virtual ~LREventRaw();
 
         void InitRootFile();   // Open the root file and create the directory and tree.
@@ -27,6 +29,7 @@ class LREventRaw : public LEventRaw
         void ReadROOTFile(std::string filename);                     // Read the root file and get the tree.
         bool ReadEvent() override;                                             // Read the event from the tree.
         TFile* GetRootFile(){return rootfile.get();};
+        void Close();
     private:
        const  LJsonConfig& cmd_config;
        std::unique_ptr<TFile> rootfile;

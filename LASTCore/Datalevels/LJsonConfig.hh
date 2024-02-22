@@ -7,6 +7,7 @@
 #include "gflags/gflags.h"
 #include "nlohmann/json.hpp"
 #include "./LASTDL1/LDL1TelEvent.hh"
+#include <sstream>
 
 /**
  * @brief It not only handle the Json configuration but also the command line configuration.
@@ -72,12 +73,41 @@ class LJsonConfig
     LQualityCheck* quality_check;
     const std::vector<std::string> clean_methods{"TailCutsCleaner", "MARSCleaner"};
     bool StoreWaveform = false;
+    static std::vector<int> splitStringToInt(const std::string& input, char delimiter) {
+    std::vector<int> output;
+    std::stringstream ss(input);
+    std::string token;
+    while (std::getline(ss, token, delimiter)) {
+        try {
+            output.push_back(std::stoi(token));
+        } catch (const std::invalid_argument& e) {
+            // 处理转换失败的情况
+            std::cerr << "Invalid argument: " << token << std::endl;
+        } catch (const std::out_of_range& e) {
+            // 处理整数超出范围的情况
+            std::cerr << "Out of range: " << token << std::endl;
+        }
+    }
+        return output;
+    }
+    static std::vector<std::string> splitString(const std::string& str, char delimiter) {
+        std::vector<std::string> tokens;
+        std::string token;
+        std::istringstream tokenStream(str);
+        while (std::getline(tokenStream, token, delimiter)) {
+            tokens.push_back(token);
+        }
+        return tokens;
+    }
     public:
+        std::vector<std::string> input_fnames;
+        std::vector<int> only_telescopes;
         LJsonConfig(int argc, char** argv)
         {
             ParseCommandLineFlags(argc, argv);
             ReadConfiguration();
             quality_check = new LQualityCheck();
+            writer_info = new DataWriterinfo();
         }
         ~LJsonConfig(){};
         void ParseCommandLineFlags(int argc, char** argv);
