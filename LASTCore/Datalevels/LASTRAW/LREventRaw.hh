@@ -29,6 +29,7 @@ class LREventRaw : public LEventRaw
         void ReadROOTFile(std::string filename);                     // Read the root file and get the tree.
         bool ReadEvent() override;                                             // Read the event from the tree.
         TFile* GetRootFile(){return rootfile.get();};
+        void Close();
     private:
        const  LJsonConfig& cmd_config;
        std::unique_ptr<TFile> rootfile;

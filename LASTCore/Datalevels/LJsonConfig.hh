@@ -7,6 +7,7 @@
 #include "gflags/gflags.h"
 #include "nlohmann/json.hpp"
 #include "./LASTDL1/LDL1TelEvent.hh"
+#include <sstream>
 
 /**
  * @brief It not only handle the Json configuration but also the command line configuration.

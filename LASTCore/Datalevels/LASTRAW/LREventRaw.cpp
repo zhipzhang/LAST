@@ -93,6 +93,10 @@ void LREventRaw::GetShower(AllHessData *hsdata)
     LEventRaw::GetShower(hsdata);
     WriteShower(rootfile.get());
 }
+void LREventRaw::Close()
+{
+    rootfile->Close();
+}
 void LREventRaw::StoreTTree()
 {
     ReadRunConfig();

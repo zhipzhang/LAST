@@ -18,24 +18,19 @@ int main(int argc, char** argv)
         output_fname = config.GetUrl() + config.GetOutputFileName();
 
     }
-
     TFile* rootfile = new TFile(output_fname.c_str(), "RECREATE");
+    rootfile->cd();
     TProfile *time_spread1 = new TProfile("time_spread1", "time_spread1", 100, 0, 1000, 0, 100);
     TProfile *time_spread2 = new TProfile("time_spread2", "time_spread2", 100, 0, 1000, 0, 100);
     for(auto input_fname: config.input_fnames)
     {
         LREventRaw* event_raw = new LREventRaw(config, input_fname);
         std::weak_ptr<LEvent> event;
-        TFile* file = new TFile((config.GetUrl() + config.GetOutputFileName()).c_str(), "RECREATE");
 
         while(event_raw->ReadEvent())
         {
             event = event_raw->EventAddress();
             auto dl0event = event.lock();
-            if(dl0event->event_shower->energy > 0.3 || dl0event->event_shower->energy < 0.2)
-            {
-                continue;
-            }
 
             for(auto tel_id : dl0event->GetImageTelList())
             {
@@ -56,8 +51,9 @@ int main(int argc, char** argv)
             }
             
         }
-        delete event_raw;
+        event_raw->Close();
     }
+    rootfile->cd();
     time_spread1->Write();   
     time_spread2->Write();
     rootfile->Close();
