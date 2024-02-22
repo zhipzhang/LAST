@@ -5,7 +5,7 @@ LRDL0Event::LRDL0Event(const LJsonConfig& config, const char mode): cmd_config(c
 {
     if(mode == 'r')
     {
-        ReadROOTFile(cmd_config.GetUrl() + config.GetInputFileName());   
+        ReadROOTFile(cmd_config.GetInputFileName());   
     }
     if( mode == 'w')
     {
@@ -67,6 +67,10 @@ void LRDL0Event::StoreTTree()
 }
 void LRDL0Event::ReadROOTFile(std::string filename)
 {
+    if(filename.compare(0, 4, "/eos") == 0)
+    {
+        filename = cmd_config.GetUrl() + filename;
+    }
     root_file.reset(TFile::Open(filename.c_str(), "READ"));
     Read(root_file.get());
     dl0_dir = root_file->GetDirectory(dl0_dirname);
