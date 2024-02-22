@@ -152,6 +152,4 @@ bool LREventRaw::ReadEvent()
 }
 LREventRaw::~LREventRaw()
 {
-    delete true_image_tree;
-    delete waveform_tree;
 }
