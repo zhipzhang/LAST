@@ -35,6 +35,7 @@ class LEventRaw : public LDataBase{
         virtual bool ReadEvent();     // Read the event from the tree.
         std::shared_ptr<LEvent> EventAddress(){return event;};
         bool HaveWaveform = false;
+        void Close();
     protected:
         LAST_IO::SimTelIO* simtel_file;  // Main Class to open the eventio File;
 

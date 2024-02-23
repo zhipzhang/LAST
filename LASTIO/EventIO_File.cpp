@@ -37,8 +37,8 @@ LAST_IO::EventIO_Object::EventIO_Object(string filename, unsigned long length) {
 LAST_IO::EventIO_Object::EventIO_Object(std::string filename, unsigned long length, std::string remote_url)
 {
   LOG(INFO) << "Working at eos file system , Xrootd File Initialized";
-  filename += remote_url;
-  if(endsWith(filename, ".zstd"))
+  filename = remote_url + filename;
+  if(endsWith(filename, ".zst"))
   {
     LOG(INFO) << "File is compressed with zstd";
     input_file = new CXrdFile_Zst(filename);

@@ -55,6 +55,7 @@ class LDataBase
         TDirectory* simulation_shower_dir = nullptr;     // When Write, it's directory what we write to; when Read, it's directory what we read from
         TDirectory* simulation_config_dir = nullptr;     // When Write, it's directory what we write to; when Read, it's directory what we read from
         TDirectory* instrument_dir = nullptr;            // When Write, it's directory what we write to; when Read, it's directory what we read from
+        void Close();
 
     private:
         void CopyDirectory(TDirectory* source, TDirectory* dest);

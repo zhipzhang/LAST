@@ -227,6 +227,14 @@ LDataBase::LDataBase()
     ishower = new LRShower();
     itel_config = new LRTelescopeConfig();
 }
+void LDataBase::Close()
+{
+    delete ishower;
+    delete itel_config;
+    delete ishower;
+
+    tel_config->Clear();
+}
 LDataBase::~LDataBase()
 {
     delete itel_config;

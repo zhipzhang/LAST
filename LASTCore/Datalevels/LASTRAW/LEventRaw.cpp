@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <memory>
 #include "../LTelConfig.hh"
+#include "Datalevels/LDataBase.hh"
 #include "LEventElectronic.hh"
 
 LEventRaw::LEventRaw():LDataBase()
@@ -223,6 +224,11 @@ void LEventRaw::GetEvent()
     event->GetShower(simtel_file->GetHsdata());
     event->GetTrueImage(simtel_file->GetHsdata());
     event->GetEventWaveform(simtel_file->GetHsdata());
+}
+void LEventRaw::Close()
+{
+    event->Clear();
+    LDataBase::Close();
 }
 void LEvent::GetTrueImage( AllHessData *hsdata)
 {

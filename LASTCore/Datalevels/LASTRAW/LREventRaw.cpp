@@ -96,6 +96,7 @@ void LREventRaw::GetShower(AllHessData *hsdata)
 void LREventRaw::Close()
 {
     rootfile->Close();
+    LEventRaw::Close();
 }
 void LREventRaw::StoreTTree()
 {
