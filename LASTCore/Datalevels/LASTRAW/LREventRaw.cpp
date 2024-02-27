@@ -117,6 +117,10 @@ void LREventRaw::StoreTTree()
 }
 void LREventRaw::ReadROOTFile(std::string filename)
 {
+    if(filename.compare(0, 4, "/eos") == 0)
+    {
+        filename = cmd_config.GetUrl() + filename;
+    }
     rootfile.reset(TFile::Open(filename.c_str(), "READ"));
     rootfile->cd("simulation");
     Read(rootfile.get());

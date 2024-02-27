@@ -35,7 +35,7 @@ class LRTelescopeConfig : public TObject
     int num_pixels;
     double* pix_x = nullptr; //[num_pixels]
     double* pix_y = nullptr; //[num_pixels]
-    TString camera_name;
+    std::string camera_name;
     Double32_t pix_size;
     int pix_shape;
     Double32_t focal_length;

@@ -229,10 +229,6 @@ LDataBase::LDataBase()
 }
 void LDataBase::Close()
 {
-    delete ishower;
-    delete itel_config;
-    delete ishower;
-
     tel_config->Clear();
 }
 LDataBase::~LDataBase()

@@ -111,7 +111,7 @@ void LImageProcessor::InitGeometry(const LTelescopes<std::shared_ptr<LRTelescope
 {
     auto tels_id = tels_config.GetKeys();
     int itel = tels_id[0];
-    tel_geometry = new LCameraGeometry((tels_config)[itel]->camera_name.Data(), (tels_config)[itel]->num_pixels, (tels_config)[itel]->pix_x, (tels_config)[itel]->pix_y, (tels_config)[itel]->pix_size, (tels_config)[itel]->pix_shape);
+    tel_geometry = new LCameraGeometry((tels_config)[itel]->camera_name, (tels_config)[itel]->num_pixels, (tels_config)[itel]->pix_x, (tels_config)[itel]->pix_y, (tels_config)[itel]->pix_size, (tels_config)[itel]->pix_shape);
     focal_length = (tels_config)[itel]->focal_length;
     same_geometry = true;
 }

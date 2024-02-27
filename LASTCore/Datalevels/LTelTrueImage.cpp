@@ -17,7 +17,6 @@ LTelTrueImage::LTelTrueImage()
 
 LTelTrueImage::~LTelTrueImage()
 {
-    LOG(INFO) << "delete LTelTrueImage";
     if( true_pe != nullptr)
     {
         delete[] true_pe;

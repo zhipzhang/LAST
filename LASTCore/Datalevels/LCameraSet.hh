@@ -2,13 +2,12 @@
 #ifndef _LCameraSet_HH_
 #define _LCameraSet_HH_
 #include "RtypesCore.h"
-#include "TString.h"
 #include "TObject.h"
 
 class LCameraSet 
 {
     public:
-        TString name;
+        std::string name;
         int     tel_id;
         int     num_pixels;//number of pixels in this camera
         Double32_t *pix_x; //[num_pixels]  unit mm
