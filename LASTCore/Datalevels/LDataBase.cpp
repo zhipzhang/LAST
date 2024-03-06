@@ -8,8 +8,8 @@
 #include "TKey.h"
 #include "TROOT.h"
 #include "TTree.h"
-#include "glog/logging.h"
-#include <memory>
+#include "spdlog/spdlog.h"
+
 
 
 
@@ -30,7 +30,7 @@ void LDataBase::Read(TFile* f)
     }
     else 
     {
-        LOG(WARNING) << "No simulation config directory in file " << f->GetName();
+        spdlog::warn("No simulation config directory in file {}", f->GetName());
     }
     instrument_dir = f->GetDirectory(instrument_dirname);
     if( instrument_dir)
@@ -43,7 +43,7 @@ void LDataBase::Read(TFile* f)
         FillTelConfig();
     }
     else {
-        LOG(WARNING) << "No instrument directory in file " << f->GetName();
+        spdlog::warn("No instrument directory in file {}", f->GetName());
     }
 
     // 读取模拟数据
@@ -124,16 +124,16 @@ void LDataBase::CopyDirectory(TDirectory* source, TDirectory* destination) {
             //destination->cd();
             TTree *tree = (TTree*)obj;
             auto a = tree->GetName();
-            LOG(INFO)<< "Source is " << a;
+            spdlog::info("Source is {}", a);
             auto b = tree->GetListOfBranches();
             destination->cd();
-            LOG(INFO)<< "Destination is " << destination->GetName();
+            spdlog::info("Destination is {}", destination->GetName());
             auto newtree = tree->CloneTree();
             newtree->Write();
             delete newtree; // 删除克隆的树以避免内存泄漏
         } else {
             // 如果对象不是目录也不是TTree，直接复制
-            LOG(INFO) << "Copy " << key->GetName();
+            spdlog::info("Copy {}", key->GetName());
             destination->cd();
             obj->Write(key->GetName());
         }
@@ -184,7 +184,7 @@ void LDataBase::WriteConfig(TFile* f)
     }
     else 
     {
-        LOG(WARNING) << "Can't mkdir simulation config directory in file " << f->GetName();
+        spdlog::warn("Can't mkdir simulation config directory in file {}", f->GetName());
     }
 
     instrument_dir = f->mkdir(instrument_dirname);
@@ -200,7 +200,7 @@ void LDataBase::WriteConfig(TFile* f)
         }
     }
     else {
-        LOG(WARNING) << "Can't mkdir instrument directory in file " << f->GetName();
+        spdlog::warn("Can't mkdir instrument directory in file {}", f->GetName());
     }
     //telconfig_tree->Write();
 
@@ -213,7 +213,7 @@ void LDataBase::WriteShower(TFile* f)
         if( simulation_shower_dir)
             shower_tree = new TTree("shower", "shower event",99, simulation_shower_dir);
         else
-            LOG(WARNING) << "Can't mkdir simulation shower directory in file " << f->GetName();
+            spdlog::warn("Can't mkdir simulation shower directory in file {}", f->GetName());
         shower_tree->Branch("shower", &ishower);
     }
     ishower = shower.get();
@@ -221,7 +221,7 @@ void LDataBase::WriteShower(TFile* f)
 }
 LDataBase::LDataBase()
 {
-    shower = std::make_unique<LRShower>();
+    shower = std::make_shared<LRShower>();
     run_config = new LRSimulationRunConfig();
     tel_config = std::make_shared<LTelescopes<std::shared_ptr<LRTelescopeConfig> >>();
     ishower = new LRShower();

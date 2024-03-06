@@ -1,7 +1,7 @@
 #include "SimTel_File.hh"
 #include "EventIO_File.hh"
-#include "glog/logging.h"
 #include "io_hess.h"
+#include "spdlog/spdlog.h"
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
@@ -11,7 +11,7 @@
 int LAST_IO::SimTelIO::read_hess_runheader() {
   RunHeader *rh = &hsdata->run_header;
   if (buffer == (BYTE *)NULL || (&hsdata->run_header) == NULL) {
-    LOG(ERROR) << "buffer is not allocated or hsdata is not allocated";
+    spdlog::error( "buffer is not allocated or hsdata is not allocated");
     return -1;
   }
   item_header->type = IO_TYPE_HESS_RUNHEADER;
@@ -159,7 +159,7 @@ int LAST_IO::SimTelIO::read_hess_mcrunheader() {
   MCRunHeader *mcrh = &hsdata->mc_run_header;
 
   if (buffer == (BYTE *)NULL || mcrh == NULL) {
-    LOG(ERROR) << "buffer is not allocated or hsdata is not allocated";
+    spdlog::error("buffer is not allocated or hsdata is not allocated");
     return -1;
   }
   item_header->type = IO_TYPE_HESS_MCRUNHEADER; /* Data type */
@@ -229,7 +229,7 @@ int LAST_IO::SimTelIO::read_hess_mcrunheader() {
 void LAST_IO::SimTelIO::Read_Camsettings() {
   tel_id = item_header->ident;
   if ((itel = find_tel_idx(tel_id)) < 0) {
-    LOG(ERROR) << "Tel ID " << tel_id << " not found";
+    spdlog::error("Tel ID {} not found", tel_id);
   }
 
   rc = read_hess_camsettings(&hsdata->camera_set[itel]);
@@ -242,15 +242,14 @@ void LAST_IO::SimTelIO::Read_Camsettings() {
 int LAST_IO::SimTelIO::read_hess_camsettings(CameraSettings *cs) {
   int rc, i;
   if (buffer == (BYTE *)NULL || cs == NULL) {
-    LOG(ERROR) << "buffer is not allocated or hsdata is not allocated";
+    spdlog::error("buffer is not allocated or hsdata is not allocated");
     return -1;
   }
   item_header->type = IO_TYPE_HESS_CAMSETTINGS; /* Data type */
   if ((rc = get_item_begin()) < 0)
     return rc;
   if (item_header->version > 6) {
-    LOG(WARNING) << "Unsupported camera settings version: "
-                 << item_header->version;
+    spdlog::warn("Unsupported camera settings version: {}", item_header->version);
     /*
     Unsupported
     */
@@ -364,7 +363,7 @@ int LAST_IO::SimTelIO::read_hess_camorgran(CameraOrganisation *co) {
   int rc;
   int w_psmx = 0, ix;
   if (buffer == (BYTE *)NULL || co == NULL) {
-    LOG(ERROR) << "buffer is not allocated or hsdata is not allocated";
+    spdlog::error("buffer is not allocated or hsdata is not allocated");
     return -1;
   }
   item_header->type = IO_TYPE_HESS_CAMORGAN; /* Data type */
@@ -388,7 +387,7 @@ int LAST_IO::SimTelIO::read_hess_camorgran(CameraOrganisation *co) {
     fprintf(stderr,
             "Expected CameraOrganisation for telescope ID = %d, got %ld\n",
             co->tel_id, item_header->ident);
-    // LOG(WARNING)<<"Refusing to copy CameraOrganisation for wrong telescope");
+    // spdlog(WARNING)<<"Refusing to copy CameraOrganisation for wrong telescope");
     get_item_end();
     return -1;
   }
@@ -401,7 +400,7 @@ int LAST_IO::SimTelIO::read_hess_camorgran(CameraOrganisation *co) {
   if (co->num_pixels < 0 || co->num_pixels > H_MAX_PIX || co->num_gains < 0 ||
       co->num_gains > H_MAX_GAINS) {
     fflush(stdout);
-    // LOG(WARNING)<<"Data size in CameraOrganisation is invalid.");
+    // spdlog(WARNING)<<"Data size in CameraOrganisation is invalid.");
     fprintf(stderr, "  num_pixels = %d; allowed: %d\n", co->num_pixels,
             H_MAX_PIX);
     fprintf(stderr, "  num_gains  = %d; allowed: %d\n", co->num_gains,
@@ -530,7 +529,7 @@ int LAST_IO::SimTelIO::read_hess_pixelset(PixelSetting *ps) {
   int rc;
 
   if (buffer == (BYTE *)NULL || ps == NULL) {
-    LOG(ERROR) << "buffer is not allocated or ps is not allocated";
+    spdlog::error("buffer is not allocated or ps is not allocated");
     return -1;
   }
 
@@ -544,8 +543,8 @@ int LAST_IO::SimTelIO::read_hess_pixelset(PixelSetting *ps) {
     return -1;
   }
   if (ps->tel_id >= 0 && item_header->ident != ps->tel_id) {
-    // LOG(WARNING)<<"Refusing to copy PixelSetting for wrong telescope");
-    LOG(WARNING) << "Refusing to copy PixelSetting for wrong telescope";
+    // spdlog(WARNING)<<"Refusing to copy PixelSetting for wrong telescope");
+    spdlog::warn("Refusing to copy PixelSetting for wrong telescope");
     get_item_end();
     return -1;
   }
@@ -563,7 +562,7 @@ int LAST_IO::SimTelIO::read_hess_pixelset(PixelSetting *ps) {
              " read settings for %d pixels but the library was compiled"
              " for a maximum of %d.",
              ps->num_pixels, H_MAX_PIX);
-    LOG(WARNING) << message;
+    spdlog::warn(message);
     ps->num_pixels = 0;
     get_item_end();
     return -1;
@@ -579,7 +578,7 @@ int LAST_IO::SimTelIO::read_hess_pixelset(PixelSetting *ps) {
              " read settings for %d drawers but the library was compiled"
              " for a maximum of %d.",
              ps->num_drawers, H_MAX_DRAWERS);
-    LOG(WARNING) << message;
+    spdlog::warn(message);
     ps->num_drawers = 0;
     get_item_end();
     return -1;
@@ -595,7 +594,7 @@ int LAST_IO::SimTelIO::read_hess_pixelset(PixelSetting *ps) {
              "Data size in PixelSetting is invalid: Expected data"
              " for %d drawers but got %d",
              ps->num_drawers, rc);
-    // LOG(WARNING)<<message);
+    // spdlog(WARNING)<<message);
     ps->num_drawers = 0;
     get_item_end();
     return -1;
@@ -621,7 +620,7 @@ int LAST_IO::SimTelIO::read_hess_pixelset(PixelSetting *ps) {
       char message[1024];
       snprintf(message, sizeof(message),
                "Invalid reference pulse shape data in PixelSetting.\n");
-      LOG(WARNING) << message;
+      spdlog::warn(message);
       get_item_end();
       return -1;
     }
@@ -649,7 +648,7 @@ void LAST_IO::SimTelIO::Read_Pixelset() {
   }
   rc = read_hess_pixelset(&hsdata->pixel_set[itel]);
   if (rc != 0) {
-    LOG(ERROR) << "read_hess_pixelset() error, the status is " << rc;
+    spdlog::error("read_hess_pixelset() error, the status is {}", rc);
     exit(EXIT_FAILURE);
   }
 }
@@ -670,7 +669,7 @@ int LAST_IO::SimTelIO::read_hess_camsoftset(CameraSoftSet *cs) {
     return -1;
   }
   if (cs->tel_id >= 0 && item_header->ident != cs->tel_id) {
-    LOG(WARNING) << ("Refusing to copy CameraSoftSet for wrong telescope");
+    spdlog::warn("Refusing to copy CameraSoftSet for wrong telescope");
     get_item_end();
     return -1;
   }
@@ -685,7 +684,7 @@ int LAST_IO::SimTelIO::read_hess_camsoftset(CameraSoftSet *cs) {
   if (cs->zero_sup_num_thr < 0 ||
       (size_t)cs->zero_sup_num_thr > sizeof(cs->zero_sup_thresholds) /
                                          sizeof(cs->zero_sup_thresholds[0])) {
-    LOG(WARNING) << "Data size invalid in CameraSoftSet";
+    spdlog::warn("Data size invalid in CameraSoftSet");
     cs->zero_sup_num_thr = 0;
     get_item_end();
     return -1;
@@ -706,12 +705,12 @@ int LAST_IO::SimTelIO::read_hess_camsoftset(CameraSoftSet *cs) {
 void LAST_IO::SimTelIO::Read_Camsoftset() {
   tel_id = item_header->ident;
   if ((itel = find_tel_idx(tel_id)) < 0) {
-    LOG(ERROR) << "Camera software settings for unkown telescope " << tel_id;
+    spdlog::error("Camera software settings for unkown telescope {}", tel_id);
     exit(EXIT_FAILURE);
   }
   rc = read_hess_camsoftset(&hsdata->cam_soft_set[itel]);
   if (rc != 0) {
-    LOG(WARNING) << "Camera software settings error for " << tel_id;
+    spdlog::warn("Camera software settings error for {}", tel_id);
   }
 }
 int LAST_IO::SimTelIO::read_hess_trackset(TrackingSetup *ts) {
@@ -730,7 +729,7 @@ int LAST_IO::SimTelIO::read_hess_trackset(TrackingSetup *ts) {
     return -1;
   }
   if (ts->tel_id >= 0 && item_header->ident != ts->tel_id) {
-    // LOG(WARNING)<<"Refusing to copy TrackingSetup for wrong telescope");
+    // spdlog(WARNING)<<"Refusing to copy TrackingSetup for wrong telescope");
     get_item_end();
     return -1;
   }
@@ -757,12 +756,12 @@ int LAST_IO::SimTelIO::read_hess_trackset(TrackingSetup *ts) {
 void LAST_IO::SimTelIO::Read_Trackset() {
   tel_id = item_header->ident;
   if ((itel = find_tel_idx(tel_id)) < 0) {
-    LOG(ERROR) << "Tracking settings for unkown telescope " << tel_id;
+    spdlog::error("Tracking settings for unkown telescope {}", tel_id);
     exit(EXIT_FAILURE);
   }
   rc = read_hess_trackset(&hsdata->tracking_set[itel]);
   if (rc != 0) {
-    LOG(WARNING) << "Tracking settings error for " << tel_id;
+    spdlog::warn("Tracking settings error for {}", tel_id);
   }
 }
 int LAST_IO::SimTelIO::read_hess_pointingcor(PointingCorrection *pc) {
@@ -791,7 +790,7 @@ int LAST_IO::SimTelIO::read_hess_pointingcor(PointingCorrection *pc) {
   if (pc->num_param < 0 ||
       (size_t)pc->num_param >
           sizeof(pc->pointing_param) / sizeof(pc->pointing_param[0])) {
-    LOG(WARNING) << "Invalid data size for PointingCorrection";
+    spdlog::warn("Invalid data size for PointingCorrection");
     pc->num_param = 0;
     get_item_end();
     return -1;
@@ -804,12 +803,12 @@ int LAST_IO::SimTelIO::read_hess_pointingcor(PointingCorrection *pc) {
 void LAST_IO::SimTelIO::Read_Pointingcor() {
   tel_id = item_header->ident;
   if ((itel = find_tel_idx(tel_id)) < 0) {
-    LOG(ERROR) << "Pointing correction for unkown telescope " << tel_id;
+    spdlog::error("Pointing correction for unkown telescope {}", tel_id);
     exit(EXIT_FAILURE);
   }
   rc = read_hess_pointingcor(&hsdata->point_cor[itel]);
   if (rc != 0) {
-    LOG(WARNING) << "Pointing correction error for " << tel_id;
+    spdlog::warn("Pointing correction error for {}", tel_id);
   }
 }
 int LAST_IO::SimTelIO::read_hess_centralevent(CentralEvent *ce) {
@@ -919,7 +918,7 @@ int LAST_IO::SimTelIO::read_hess_trackevent(TrackEvent *tke) {
   tel_id =
       (item_header->ident & 0xff) | ((item_header->ident & 0x3f000000) >> 16);
   if (tel_id < 0 || tel_id != tke->tel_id) {
-    LOG(WARNING) << "Not a tracking event block or one for the wrong telescope";
+    spdlog::warn("Not a tracking event block or one for the wrong telescope");
     get_item_end();
     return -1;
   }
@@ -931,7 +930,7 @@ int LAST_IO::SimTelIO::read_hess_trackevent(TrackEvent *tke) {
   }
 
   if (tke->tel_id != tel_id) {
-    LOG(WARNING) << "Tracking data is for wrong telescope.";
+    spdlog::warn("Tracking data is for wrong telescope.");
     get_item_end();
     return -1;
   }
@@ -967,7 +966,7 @@ int LAST_IO::SimTelIO::read_hess_televt_head(TelEvent *te) {
     return -1;
   }
   if (item_header->ident != te->tel_id) {
-    LOG(WARNING) << "Event header is for wrong telescope";
+    spdlog::warn("Event header is for wrong telescope");
     get_item_end();
     return -1;
   }
@@ -1081,8 +1080,7 @@ int LAST_IO::SimTelIO::read_hess_teladc_sums(AdcData *raw) {
       */
       (raw->num_pixels >= 32768 && raw->zero_sup_mode > 1) ||
       raw->zero_sup_mode > 2 || raw->data_red_mode > 2) {
-    LOG(WARNING)
-        << "Invalid raw data block is skipped (limits exceeded or bad mode).";
+    spdlog::warn("Invalid raw data block is skipped (limits exceeded or bad mode).");
     fprintf(stderr, "Num_pixels=%d, num_gains=%d, zero_sup=%d, data_red=%d\n",
             raw->num_pixels, raw->num_gains, raw->zero_sup_mode,
             raw->data_red_mode);
@@ -1538,7 +1536,7 @@ int LAST_IO::SimTelIO::read_hess_teladc_samples(AdcData *raw, int what) {
   list_known = (flags >> 10) & 0x01; /* Bit 10 was never set, thus zero */
   if ((zero_sup_mode != 0 && item_header->version < 3) || data_red_mode != 0 ||
       list_known) {
-    LOG(WARNING) << "Unsupported ADC sample format";
+    spdlog::warn("Unsupported ADC sample format");
     get_item_end();
     return -1;
   }
@@ -1574,7 +1572,7 @@ int LAST_IO::SimTelIO::read_hess_teladc_samples(AdcData *raw, int what) {
 
   if (raw->num_pixels > H_MAX_PIX || raw->num_gains > H_MAX_GAINS ||
       raw->num_samples > H_MAX_SLICES) {
-    LOG(WARNING) << "Invalid raw data block is skipped (limits exceeded).";
+    spdlog::warn("Invalid raw data block is skipped (limits exceeded).");
     fprintf(stderr, "Num_pixels=%d, num_gains=%d, num_samples=%d\n",
             raw->num_pixels, raw->num_gains, raw->num_samples);
     get_item_end();
@@ -1602,8 +1600,7 @@ int LAST_IO::SimTelIO::read_hess_teladc_samples(AdcData *raw, int what) {
     /* Common or high-gain pixel list */
     list_size = get_scount32();
     if (list_size > H_MAX_PIX) {
-      LOG(WARNING)
-          << "Pixel list too large in zero-suppressed sample-mode data.";
+      spdlog::warn("Pixel list too large in zero-suppressed sample-mode data.");
       get_item_end();
       return -1;
     }
@@ -1625,8 +1622,7 @@ int LAST_IO::SimTelIO::read_hess_teladc_samples(AdcData *raw, int what) {
     if (data_red_mode && raw->num_gains > 1) {
       list_size_lg = get_scount32();
       if (list_size_lg > H_MAX_PIX) {
-        LOG(WARNING) << "Pixel list too large in low-gain zero-suppressed "
-                        "sample-mode data.";
+        spdlog::warn("Pixel list too large in low-gain zero-suppressed sample-mode data.");
         get_item_end();
         return -1;
       }
@@ -2131,7 +2127,7 @@ int LAST_IO::SimTelIO::read_hess_telimage(ImgData *img) {
 
   if (((item_header->ident & 0xff) |
        ((item_header->ident & 0x3f000000) >> 16)) != img->tel_id) {
-    LOG(WARNING) << "Image data is for wrong telescope";
+    spdlog::warn("Image data is for wrong telescope");
     get_item_end();
     return -1;
   }
@@ -2244,8 +2240,7 @@ int LAST_IO::SimTelIO::read_hess_televent(TelEvent *te, int what) {
   tel_id = (item_header->type - IO_TYPE_HESS_TELEVENT) % 100 +
            100 * ((item_header->type - IO_TYPE_HESS_TELEVENT) / 1000);
   if (tel_id < 0 || tel_id != te->tel_id) {
-    LOG(WARNING)
-        << "Not a telescope event block or one for the wrong telescope";
+    spdlog::warn("Not a telescope event block or one for the wrong telescope");
     get_item_end();
     return -1;
   }
@@ -2286,7 +2281,7 @@ int LAST_IO::SimTelIO::read_hess_televent(TelEvent *te, int what) {
     case IO_TYPE_HESS_TELADCSUM:
       if ((what & (RAWDATA_FLAG | RAWSUM_FLAG)) == 0 || raw == NULL) {
         if (w_sum++ < 1)
-          LOG(WARNING) << "Telescope raw data ADC sums not selected to be read";
+          spdlog::warn("Telescope raw data ADC sums not selected to be read");
         rc = skip_subitem();
         continue;
       }
@@ -2300,8 +2295,7 @@ int LAST_IO::SimTelIO::read_hess_televent(TelEvent *te, int what) {
     case IO_TYPE_HESS_TELADCSAMP:
       if ((what & RAWDATA_FLAG) == 0 || raw == NULL) {
         if (w_samp++ < 1)
-          LOG(WARNING)
-              << "Telescope raw data ADC samples not selected to be read";
+          spdlog::warn("Telescope raw data ADC samples not selected to be read");
         rc = skip_subitem();
         continue;
       }
@@ -2322,7 +2316,7 @@ int LAST_IO::SimTelIO::read_hess_televent(TelEvent *te, int what) {
     case IO_TYPE_HESS_PIXELTIMING:
       if (te->pixtm == NULL || (what & TIME_FLAG) == 0) {
         if (w_pixtm++ < 1)
-          LOG(WARNING) << "Telescope pixel timing data not selected to be read";
+          spdlog::warn("Telescope pixel timing data not selected to be read");
         rc = skip_subitem();
         continue;
       }
@@ -2332,11 +2326,10 @@ int LAST_IO::SimTelIO::read_hess_televent(TelEvent *te, int what) {
     case IO_TYPE_HESS_PIXELCALIB:
       if (te->pixcal == NULL) {
         if (w_pixcal++ < 1)
-          LOG(WARNING) << "Telescope calibrated pixel intensities found, "
-                          "allocating structures.";
+          spdlog::warn("Telescope calibrated pixel intensities found, allocating structures.");
         if ((te->pixcal = (PixelCalibrated *)calloc(
                  1, sizeof(PixelCalibrated))) == NULL) {
-          LOG(WARNING) << "Not enough memory for PixelCalibrated";
+          spdlog::warn("Not enough memory for PixelCalibrated");
           break;
         }
         te->pixcal->tel_id = tel_id;
@@ -2348,7 +2341,7 @@ int LAST_IO::SimTelIO::read_hess_televent(TelEvent *te, int what) {
       if (img == NULL || (what & IMAGE_FLAG) == 0)
         break;
       if (tel_img >= te->max_image_sets) {
-        LOG(WARNING) << "Not enough space to read all image sets";
+        spdlog::warn("Not enough space to read all image sets");
         break;
       }
       if ((rc = read_hess_telimage(&img[tel_img])) == 0) {
@@ -2576,7 +2569,7 @@ int LAST_IO::SimTelIO::read_hess_event(FullEvent *ev, int what) {
       tel_id = (type - IO_TYPE_HESS_TRACKEVENT) % 100 +
                100 * ((type - IO_TYPE_HESS_TRACKEVENT) / 1000);
       if ((itel = find_tel_idx(tel_id)) < 0) {
-        LOG(WARNING) << "Telescope number out of range for tracking data";
+        spdlog::warn("Telescope number out of range for tracking data");
         get_item_end();
         return -1;
       }
@@ -2599,8 +2592,7 @@ int LAST_IO::SimTelIO::read_hess_event(FullEvent *ev, int what) {
       tel_id = (type - IO_TYPE_HESS_TELEVENT) % 100 +
                100 * ((type - IO_TYPE_HESS_TELEVENT) / 1000);
       if ((itel = find_tel_idx(tel_id)) < 0) {
-        LOG(WARNING)
-            << "Telescope number out of range for telescope event data";
+        spdlog::warn("Telescope number out of range for telescope event data");
         get_item_end();
         return -1;
       }
@@ -2619,7 +2611,7 @@ int LAST_IO::SimTelIO::read_hess_event(FullEvent *ev, int what) {
     } else {
       char msg[200];
       sprintf(msg, "Invalid item type %d in event %d.", type, id);
-      LOG(WARNING) << msg;
+      spdlog::warn(msg);
       get_item_end();
       return -1;
     }
@@ -2716,7 +2708,7 @@ void LAST_IO::SimTelIO::Read_Calib_Event() {
   int type = -1;
   rc = read_hess_calib_event(&hsdata->event, -1, &type);
   if (rc != 0) {
-    LOG(WARNING) << "Read Calib Events error, rc = " << rc;
+    spdlog::warn("Read Calib Events error, rc = {}", rc);
   }
 }
 int LAST_IO::SimTelIO::read_hess_mc_phot(MCEvent *mce) {
@@ -2744,7 +2736,7 @@ int LAST_IO::SimTelIO::read_hess_mc_phot(MCEvent *mce) {
       tel_id = itel_pe + 1;
       itel = find_tel_idx(tel_id);
       if (itel < 0 || itel >= H_MAX_TEL) {
-        LOG(WARNING) << "Invalid telescope number in MC photons";
+        spdlog::warn("Invalid telescope number in MC photons");
         get_item_end();
         return -1;
       }
@@ -2776,7 +2768,7 @@ int LAST_IO::SimTelIO::read_hess_mc_phot(MCEvent *mce) {
         mce->mc_photons[itel].nbunches = nbunches;
 
       if (jtel != itel) {
-        LOG(WARNING) << "Inconsistent telescope number for MC photons";
+        spdlog::warn("Inconsistent telescope number for MC photons");
         get_item_end();
         return -5;
       }
@@ -2800,12 +2792,12 @@ int LAST_IO::SimTelIO::read_hess_mc_phot(MCEvent *mce) {
       tel_id = itel_pe + 1; /* Also note: 1 <= tel_id <= 1000 */
       itel = find_tel_idx(tel_id);
       if (itel < 0 || itel >= H_MAX_TEL) {
-        LOG(WARNING) << "Invalid telescope number in MC photons";
+        spdlog::warn("Invalid telescope number in MC photons");
         get_item_end();
         return -1;
       }
       if (pixels > H_MAX_PIX) {
-        LOG(WARNING) << "Invalid number of pixels in MC photons";
+        spdlog::warn("Invalid number of pixels in MC photons");
         get_item_end();
         return -1;
       }
@@ -2880,13 +2872,13 @@ void LAST_IO::SimTelIO::Read_MC_Phot() {
     rc = read_hess_mc_phot(&hsdata->mc_event);
   }
   if (rc != 0) {
-    LOG(WARNING) << "Error reading MC photons rc = " << rc;
+    spdlog::warn("Error reading MC photons rc = {}", rc);
   }
 }
 void LAST_IO::SimTelIO::Read_Event() {
   rc = read_hess_event(&hsdata->event, -1);
   if (rc != 0) {
-    LOG(WARNING) << "Error reading event rc = " << rc;
+    spdlog::warn("Error reading event rc = {}", rc);
   }
   num_events++;
 }
@@ -2969,7 +2961,7 @@ int LAST_IO::SimTelIO::read_photo_electrons(int max_pixel, int max_pe,
     else
       ipix = get_short();
     if (ipix < 0 || ipix >= max_pixels) {
-      LOG(WARNING) << "Invalid pixel number for photo-electron list";
+      spdlog::warn("Invalid pixel number for photo-electron list");
       get_item_end();
       return -5;
     }
@@ -3005,7 +2997,7 @@ int LAST_IO::SimTelIO::read_photo_electrons(int max_pixel, int max_pe,
     for (i = it = 0; i < nonempty; i++) {
       ipix = get_short();
       if (ipix < 0 || ipix >= max_pixels) {
-        LOG(WARNING) << "Invalid pixel number for photon count";
+        spdlog::warn("Invalid pixel number for photon count");
         get_item_end();
         return -5;
       }
@@ -3186,7 +3178,7 @@ int LAST_IO::SimTelIO::read_hess_mc_event(MCEvent *mce) {
 void LAST_IO::SimTelIO::Read_Mc_Event() {
   rc = read_hess_mc_event(&hsdata->mc_event);
   if (rc != 0) {
-    LOG(WARNING) << "Error reading MC event data";
+    spdlog::warn("Error reading MC event data");
   }
 }
 int LAST_IO::SimTelIO::read_hess_mc_pe_sum(MCpeSum *mcpes) {
@@ -3211,7 +3203,7 @@ int LAST_IO::SimTelIO::read_hess_mc_pe_sum(MCpeSum *mcpes) {
 
   mcpes->num_tel = get_int32();
   if (mcpes->num_tel > H_MAX_TEL) {
-    LOG(WARNING) << "Too many telescopes in p.e. sum";
+    spdlog::warn("Too many telescopes in p.e. sum");
     return -1;
   }
 
@@ -3227,7 +3219,7 @@ int LAST_IO::SimTelIO::read_hess_mc_pe_sum(MCpeSum *mcpes) {
       continue;
 
     if (mcpes->num_pixels[i] > H_MAX_PIX) {
-      LOG(WARNING) << "Too many pixels in MC p.e. sum";
+      spdlog::warn("Too many pixels in MC p.e. sum");
       get_item_end();
       return -1;
     }
@@ -3284,7 +3276,7 @@ int LAST_IO::SimTelIO::read_hess_mc_pixel_moni(MCPixelMonitor *mcpixmon) {
 
   /* If there is already a telescope ID in the struct it must match the data */
   if (item_header->ident != mcpixmon->tel_id && mcpixmon->tel_id != 0) {
-    LOG(WARNING) << "MC Pixel Monitor block is for wrong telescope";
+    spdlog::warn("MC Pixel Monitor block is for wrong telescope");
     get_item_end();
     return -1;
   }
@@ -3298,7 +3290,7 @@ int LAST_IO::SimTelIO::read_hess_mc_pixel_moni(MCPixelMonitor *mcpixmon) {
      if the struct is already in use, it does match the prior value. */
   if (npix <= 0 || npix > H_MAX_PIX ||
       (npix > 0 && mcpixmon->num_pixels > 0 && npix != mcpixmon->num_pixels)) {
-    LOG(WARNING) << "MC Pixel Monitor block has invalid number of pixels";
+    spdlog::warn("MC Pixel Monitor block has invalid number of pixels");
     get_item_end();
     return -1;
   }
@@ -3307,7 +3299,7 @@ int LAST_IO::SimTelIO::read_hess_mc_pixel_moni(MCPixelMonitor *mcpixmon) {
      if the struct is already in use, it does match the prior value. */
   if (ngain <= 0 || ngain > H_MAX_GAINS ||
       (ngain > 0 && mcpixmon->num_gains > 0 && ngain != mcpixmon->num_gains)) {
-    LOG(WARNING) << "MC Pixel Monitor block has invalid number of gains";
+    spdlog::warn("MC Pixel Monitor block has invalid number of gains");
     get_item_end();
     return -1;
   }
@@ -3358,7 +3350,7 @@ int LAST_IO::SimTelIO::read_hess_tel_monitor(TelMoniData *mon) {
   tel_id =
       ((item_header->ident & 0xff) | ((item_header->ident & 0x3f000000) >> 16));
   if (tel_id != mon->tel_id) {
-    LOG(WARNING) << "Monitor block is for wrong telescope";
+    spdlog::warn("Monitor block is for wrong telescope");
     get_item_end();
     return -1;
   }
@@ -3387,10 +3379,10 @@ int LAST_IO::SimTelIO::read_hess_tel_monitor(TelMoniData *mon) {
       (mon->num_pixels != np && mon->num_pixels != 0) ||
       (mon->num_drawers != nd && mon->num_drawers != 0) ||
       (mon->num_gains != ng && mon->num_gains != 0)) {
-    LOG(WARNING) << "Monitor data is for a camera of different setup";
+    spdlog::warn("Monitor data is for a camera of different setup");
     if (ns > H_MAX_SECTORS || np > H_MAX_PIX || nd > H_MAX_DRAWERS ||
         ng > H_MAX_GAINS) {
-      LOG(WARNING) << "Monitor data has invalid camera setup";
+      spdlog::warn("Monitor data has invalid camera setup");
       get_item_end();
       mon->new_parts = 0;
       return -1;
@@ -3494,7 +3486,7 @@ void LAST_IO::SimTelIO::Read_Tel_Moni() {
   tel_id =
       (item_header->ident & 0xff) | ((item_header->ident & 0x3f000000) >> 16);
   if ((itel = find_tel_idx(tel_id)) < 0) {
-    LOG(ERROR) << " Telsceope monitor block for unkown telescope " << tel_id;
+    spdlog::error(" Telsceope monitor block for unkown telescope {}", tel_id);
   }
   rc = read_hess_tel_monitor(&hsdata->tel_moni[itel]);
 }
@@ -3516,7 +3508,7 @@ int LAST_IO::SimTelIO::read_hess_laser_calib(LasCalData *lcd) {
   }
 
   if (lcd->tel_id != item_header->ident) {
-    LOG(WARNING) << "Laser calibration data is for wrong telescope";
+    spdlog::warn("Laser calibration data is for wrong telescope");
     get_item_end();
     return -1;
   }
@@ -3525,12 +3517,12 @@ int LAST_IO::SimTelIO::read_hess_laser_calib(LasCalData *lcd) {
   ng = get_short();
   if ((np != lcd->num_pixels && lcd->num_pixels != 0) ||
       (ng != lcd->num_gains && lcd->num_gains != 0)) {
-    LOG(WARNING) << "Laser calibration data is for different setup";
+    spdlog::warn("Laser calibration data is for different setup");
   }
   lcd->num_pixels = np;
   lcd->num_gains = ng;
   if (np > H_MAX_PIX || ng > H_MAX_GAINS) {
-    LOG(WARNING) << "Laser calibration data is bad setup";
+    spdlog::warn("Laser calibration data is bad setup");
     get_item_end();
     return -1;
   }
@@ -3579,11 +3571,8 @@ int LAST_IO::SimTelIO::read_hess_laser_calib(LasCalData *lcd) {
   }
 
   if (!lcd->known) {
-    char message[1024];
-    sprintf(message,
-            "Laser calibration for telescope %d was not properly filled.",
-            lcd->tel_id);
-    LOG(WARNING) << message;
+    spdlog::warn("Laser calibration for telescope {} was not properly filled.",
+                 lcd->tel_id);
   }
 
   return get_item_end();
@@ -3592,7 +3581,7 @@ int LAST_IO::SimTelIO::read_hess_laser_calib(LasCalData *lcd) {
 void LAST_IO::SimTelIO::Read_Las_Cal() {
   tel_id = item_header->ident;
   if ((itel = find_tel_idx(tel_id)) < 0) {
-    LOG(ERROR) << " Laser calibration block for unkown telescope " << tel_id;
+    spdlog::error(" Laser calibration block for unkown telescope {}", tel_id);
   }
   rc = read_hess_laser_calib(&hsdata->tel_lascal[itel]);
 }
@@ -3711,7 +3700,7 @@ void LAST_IO::SimTelIO::Check() {
     }
     if (hsdata == NULL && item_header->type > IO_TYPE_HESS_RUNHEADER &&
         item_header->type < IO_TYPE_HESS_RUNHEADER + 200) {
-      LOG(WARNING) << "Tring to read event data before run header block";
+      spdlog::warn("Tring to read event data before run header block");
       continue;
     }
     switch ((int)item_header->type) {

@@ -1,7 +1,6 @@
 #include "LRDL1Event.hh"
 #include "Datalevels/LShower.hh"
-#include "glog/logging.h"
-
+#include "spdlog/spdlog.h"
 
 LRDL1Event::LRDL1Event(const LJsonConfig& cfg, const char mode): cmd_config(cfg), LDL1Event()
 {
@@ -50,7 +49,7 @@ void LRDL1Event::ReadROOTFile(std::string filename)
     }
     else 
     {
-        LOG(ERROR) << "Can't find the directory " << dl1_dirname << " in file " << filename;
+        spdlog::error("Can't find the directory {} in file {}", dl1_dirname, filename);
     }
 
 }
@@ -69,7 +68,7 @@ bool LRDL1Event::ReadEvent()
             auto flag = dl1event_tree->GetEntryWithIndex(ldl1array->event_id, itel);
             if( flag == -1)
             {
-                LOG(ERROR) << "Can't find the event " << ldl1array->event_id << " in telescope " << itel;
+                spdlog::error("Can't find the event {} in telescope {}", ldl1array->event_id, itel);
                 return false;
             }
             AddTelEvent(itel, dl1_tel_event);

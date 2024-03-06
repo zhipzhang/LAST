@@ -1,6 +1,5 @@
 #include "LTelTrueImage.hh"
 #include "RtypesCore.h"
-#include "glog/logging.h"
 #include <algorithm>
 #include <cstddef>
 LTelTrueImage::LTelTrueImage()

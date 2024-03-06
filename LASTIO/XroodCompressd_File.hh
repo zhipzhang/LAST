@@ -12,6 +12,7 @@
 #define _XrootdCompressed_File__H
 #include "Base_File.hh"
 #include "LAST_types.hh"
+#include "spdlog/spdlog.h"
 #include <cstddef>
 #include <cstring>
 #include <zlib.h> // uncomress the gz file
@@ -38,7 +39,7 @@ class CXrdFile_Zst : public XrdFile {
     LASTByteNum rc;
     if((rc = XrdFile::read(bufferInSize, (BYTE*)buffIn)) != bufferInSize)
     {
-      LOG(ERROR) << "Error in Reading, Maybe End of File";
+      spdlog::error("Error in Reading, Maybe End of File");
     }
     input = {buffIn, rc, 0};
   }
@@ -48,7 +49,7 @@ class CXrdFile_Zst : public XrdFile {
     const size_t ret= ZSTD_decompressStream(ZSTD_DStream, &output, &input);
         if(ZSTD_isError(ret))
         {
-          LOG(ERROR) << "Error in decompressing the zstd file";
+          spdlog::error("Error in decompressing the zstd file");
           return false;
         }
     buf_remaining = output.pos;

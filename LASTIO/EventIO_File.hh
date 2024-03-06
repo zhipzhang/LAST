@@ -7,8 +7,8 @@
 #include "initial.h"
 #include <byteswap.h>
 #include <vector>
-#include "glog/logging.h"
 #include "Base_File.hh"
+#include "spdlog/spdlog.h"
 typedef unsigned char BYTE;
 // using json = nlohmann::json;
 using string = std::string;
@@ -81,11 +81,11 @@ class EventIO_Object {
     bytesread = input_file->read(size, buffer + buffer_off);
     if (bytesread < size) {
       if (input_file->IsEnd()) {
-        LOG(INFO) << "At End of the File";
+        spdlog::info("At End of the File");
         return 0;
       }
-      LOG(INFO) << "the offset is " << input_file->GetOffset();
-      LOG(ERROR) << "Error in read: Error Number " << bytesread;
+      spdlog::info("the offset is {}", input_file->GetOffset());
+      spdlog::error("Error in read: Error Number {}", bytesread);
     }
     return (int)bytesread;
   }
@@ -94,7 +94,7 @@ class EventIO_Object {
       input_file->seek_cur(off);
     }
     catch (int err_num) {
-      LOG(ERROR) << "Error in seek_cur: Error Number " << err_num;
+      spdlog::error("Error in seek_cur: Error Number {}", err_num);
     }
   }
 

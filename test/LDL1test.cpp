@@ -2,14 +2,13 @@
 #include "Datalevels/LASTDL1/LRDL1Event.hh"
 #include "Datalevels/LASTConverter/LImageProcessor.hh"
 #include "Datalevels/LJsonConfig.hh"
-#include "glog/logging.h"
+#include "spdlog/spdlog.h"
 
 
 
 int main(int argc, char** argv)
 {
-    google::InitGoogleLogging(argv[0]);
-    google::SetStderrLogging(google::GLOG_INFO);
+    spdlog::set_level(spdlog::level::info);
     LJsonConfig config(argc, argv);
     auto lastdl0 = new  LRDL0Event(config);
     auto lastdl1 = new LRDL1Event(config, 'w');

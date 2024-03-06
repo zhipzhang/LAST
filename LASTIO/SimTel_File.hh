@@ -1,6 +1,6 @@
+#include "spdlog/spdlog.h"
 #ifndef _SIMTEL_HEADER
 #define _SIMTEL_HEADER 1
-#include "glog/logging.h"
 #include <cstdint>
 #include <string>
 
@@ -127,11 +127,11 @@ class SimTelIO : public EventIO_Object {
 
   SimTelIO(string fname, unsigned long max_length, string remote_url)
       : EventIO_Object(fname, max_length, remote_url) {
-    LOG(INFO) << "SimTelIO constructor: \n";
+    spdlog::info( "SimTelIO constructor: \n");
   }
   SimTelIO(string fname, unsigned long max_length)
       : EventIO_Object(fname, max_length) {
-    LOG(INFO) << "SimTelIO constructor: \n";
+    spdlog::info("SimTelIO constructor: \n");
   }
   AllHessData *GetHsdata() { return hsdata; }
   ~SimTelIO() {
@@ -153,7 +153,7 @@ class SimTelIO : public EventIO_Object {
     if (rc == 0) {
       return true;
     } else {
-      LOG(ERROR) << "Error Reading block " << (int)item_header->type;
+      spdlog::error("Error Reading block {}", (int)item_header->type);
       return false;
     }
   }

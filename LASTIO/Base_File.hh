@@ -20,8 +20,8 @@
 #include "XrdCl/XrdClXRootDResponses.hh"
 #include "Konrad_hessio/fileopen.h"
 #include <sys/stat.h>
-#include "glog/logging.h"
 #include "LAST_types.hh"
+#include "spdlog/spdlog.h"
 using string = std::string;
 class AbstractFile {
  public:
@@ -48,8 +48,7 @@ class AbstractFile {
       return false;
     else {
       return true;
-      LOG(ERROR) << "You are probably handling a compressed file (which are "
-                    "not handled well especially for xrootd file)";
+      spdlog::error("You are probably handling a compressed file (which are not handled well especially for xrootd file)");
     }
     // exit(EXIT_FAILURE);
   }
@@ -84,8 +83,7 @@ class XrdFile : public AbstractFile {
     XrdCl::XRootDStatus status =
         input_file->Read(offset, size, buffer, bytes_read, 999);
     if (bytes_read < size) {
-      LOG(WARNING) << "Failed to read Xrootd file, offset: " << offset
-                   << ", size: " << size << ", bytes_read: " << bytes_read;
+      spdlog::warn("Failed to read Xrootd file, offset: {0}, size: {1}, bytes_read: {2}", offset, size, bytes_read);
       return bytes_read;
     }
     offset += size;
@@ -93,8 +91,7 @@ class XrdFile : public AbstractFile {
   }
   virtual void seek_cur(LASTFileOffset off) override {
     if ((offset + off) > (LASTFileOffset)getFileSize()) {
-      LOG(ERROR) << " Seek cur Exceed Xrootd file size "
-                 << "offset: " << offset << ", file size: " << getFileSize();
+      spdlog::error("Seek cur Exceed Xrootd file size offset: {0}, file size: {1}", offset, getFileSize());
       throw - 71;
     }
     offset += off;
@@ -131,7 +128,7 @@ class PosixFile : public AbstractFile {
     }
     struct stat filestat;
     if (fstat(fileno(input_file), &filestat) < 0) {
-      LOG(ERROR) << "Failed to get Posix file:" << filename << " information";
+      spdlog::error("Failed to get Posix file: {0} information", filename);
       exit(EXIT_FAILURE);
     }
     if (S_ISFIFO(filestat.st_mode)) {
@@ -156,8 +153,7 @@ class PosixFile : public AbstractFile {
   LASTByteNum read(LASTByteNum size, BYTE *buffer) override {
     LASTByteNum bytes_read = fread(buffer, 1, size, input_file);
     if (bytes_read < size) {
-      LOG(WARNING) << "Failed to read Posix file  size: " << size
-                   << ", bytes_read: " << bytes_read;
+      spdlog::warn("Failed to read Posix file  size: {0}, bytes_read: {1}", size, bytes_read);
     }
     offset = offset + bytes_read;
     return bytes_read;
@@ -204,7 +200,7 @@ class PosixFile : public AbstractFile {
     if (rbuf > 0) {
       rb = fread(buffer, 1, rbuf, input_file);
       if (rb < rbuf) {
-        LOG(WARNING) << " End of file ?";
+        spdlog::warn("End of file ?");
       }
     }
   }

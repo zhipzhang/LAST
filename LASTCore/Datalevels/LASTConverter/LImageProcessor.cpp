@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <numeric>
 #include "eigen3/Eigen/Dense"
+#include "spdlog/spdlog.h"
 #include <deque>
 
 LHillasParameters LImageProcessor::Compute_Hillas(const LCameraGeometry& geom, const std::vector<double>& cleaned_image)
@@ -45,7 +46,7 @@ LHillasParameters LImageProcessor::Compute_Hillas(const LCameraGeometry& geom, c
     Eigen::MatrixXd cov = datamatrix1 * datamatrix2;
     Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigensolver(cov);
        if (eigensolver.info() != Eigen::Success) {
-        LOG(WARNING) << "Eigenvalue decomposition failed!"; 
+        spdlog::warn("Eigenvalue decomposition failed!");
     }
 
     // Using TPrincipal is not working, so I use Eigen instead.
@@ -225,7 +226,7 @@ void LImageProcessor::Compute_Morphology(const LCameraGeometry& geom, const std:
     int num_pixels = cleaned_image.size();
     if(geom.GetPixX().size() != num_pixels)
     {
-        LOG(ERROR) << "The number of pixels in the geometry is not equal to the number of pixels in the image!";
+        spdlog::error("The number of pixels in the geometry is not equal to the number of pixels in the image!");
         return;
     }
     std::deque<int> pixel_queue;
@@ -284,7 +285,7 @@ void LImageProcessor::Compute_Morphology(LRDL1TelEvent &dl1televent)
     }
     if( verified_pixels != num_image_pixels)
     {
-        LOG(ERROR) << "The number of verified pixels is not equal to the number of image pixels!";
+        spdlog::error("The number of verified pixels is not equal to the number of image pixels!");
     }
     dl1televent.SetMorphology(num_island, num_image_pixels, num_large_island, num_medium_island, num_small_island);
 }

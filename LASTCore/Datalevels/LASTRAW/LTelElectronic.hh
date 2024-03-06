@@ -8,7 +8,6 @@
 #include "../LTelescopesTemplate.hh"
 #include <cstdint>
 #include <memory>
-#include "glog/logging.h"
 class LTelElectronic
 {
     public:

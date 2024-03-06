@@ -6,6 +6,6 @@ set(DLSources LASTRAW/LEventRaw.cpp LASTRAW/LREventRaw.cpp LASTRAW/LEventElectro
 	${CMAKE_SOURCE_DIR}/LASTCore/Image/LHillasParameters.cpp ${CMAKE_SOURCE_DIR}/LASTCore/Image/LCleaning.cpp ${CMAKE_SOURCE_DIR}/LASTCore/Instrument/LCameraGeometry.cpp  LASTDL1/LDL1bEvent.cpp LASTDL1/LRDL1bEvent.cpp ${CMAKE_SOURCE_DIR}/LASTCore/reconstruction/LHillasReconstructor.cpp)
 add_library(DLs STATIC ${DLSources})
 target_link_libraries(DLs PUBLIC LASTIO)
-target_link_libraries(DLs PRIVATE glog::glog gflags::gflags nlohmann_json::nlohmann_json  ${ROOT_LIBRARIES})
+target_link_libraries(DLs PUBLIC spdlog::spdlog_header_only gflags::gflags nlohmann_json::nlohmann_json  ${ROOT_LIBRARIES})
 target_include_directories(DLs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/LASTRAW ${ROOT_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/LASTDL0 ${CMAKE_SOURCE_DIR}/LASTCore ${CMAKE_SOURCE_DIR}/ExternalLib ${CMAKE_CURRENT_SOURCE_DIR}/LASTDL1)
 ROOT_GENERATE_DICTIONARY(LDLs_dict ${HEADERFS} MODULE DLs LINKDEF ${LINKDIR}/LDLsLinkDef.h)

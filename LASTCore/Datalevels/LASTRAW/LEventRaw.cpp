@@ -213,7 +213,7 @@ bool LEventRaw::ProcessEvent()
                 break;
             default:
                 simtel_file->skip_io_block();
-                LOG(INFO) << "Skip Block" << simtel_file->GetBlockType();
+                spdlog::info("Skip Block {}", simtel_file->GetBlockType());
                 break;
         }
     }

@@ -1,13 +1,12 @@
 #include "LRDL0Event.hh"
-#include "glog/logging.h"
 #include "LREventRaw.hh"
 #include "LJsonConfig.hh"
+#include "spdlog/spdlog.h"
 
 
 int main(int argc, char** argv)
 {
-    google::InitGoogleLogging(argv[0]);
-    google::SetStderrLogging(google::GLOG_INFO);
+    spdlog::set_level(spdlog::level::info);
     LJsonConfig config(argc, argv);
     LREventRaw* event_raw = new LREventRaw(config, 'r');
     LRDL0Event* dl0event = new LRDL0Event(config, 'w');

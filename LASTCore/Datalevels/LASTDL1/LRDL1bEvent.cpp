@@ -11,6 +11,7 @@
 
 #include "LRDL1bEvent.hh"
 #include "Datalevels/LASTDL1/LDL1bEvent.hh"
+#include "TFile.h"
 
 
 LRDL1bEvent::LRDL1bEvent(const LJsonConfig& config, const char mode): cmd_config(config), LDL1bEvent()
@@ -28,7 +29,7 @@ LRDL1bEvent::LRDL1bEvent(const LJsonConfig& config, const char mode): cmd_config
 
 void LRDL1bEvent::InitROOTFile()
 {
-    root_file = std::make_unique<TFile>((cmd_config.GetUrl() +cmd_config.GetOutputFileName()).c_str(), "RECREATE");
+    root_file.reset(TFile::Open((cmd_config.GetUrl() +cmd_config.GetOutputFileName()).c_str(), "RECREATE"));
     dir = root_file->mkdir(dirname);
     dir->cd();
     dl1arraytree = new TTree("dl1arraytree", "dl1arraytree");

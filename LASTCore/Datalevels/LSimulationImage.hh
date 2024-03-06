@@ -11,7 +11,6 @@
 #include "LTelescopesTemplate.hh"
 #include <cstdint>
 #include <memory>
-#include "glog/logging.h"
 #include "LTelTrueImage.hh"
 
 class LSimulationImage

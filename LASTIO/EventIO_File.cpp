@@ -3,8 +3,7 @@
 #include "XrdCl/XrdClFile.hh"
 #include "XrdCl/XrdClFileSystem.hh"
 #include "XrdCl/XrdClXRootDResponses.hh"
-#include "XroodCompressd_File.hh"
-#include "glog/logging.h"
+#include "spdlog/spdlog.h"
 #include "initial.h"
 #include <byteswap.h>
 #include <cstddef>
@@ -13,13 +12,13 @@
 #include <endian.h>
 
 LAST_IO::EventIO_Object::EventIO_Object(string filename, unsigned long length) {
-  LOG(INFO) << "Working at local file system , Local File Initialized";
+  spdlog::info("Working at local file system, Local File Initialized");
   input_file = new PosixFile(filename);
   item_header = new HEADER();
   int len = 10000;
   sub_item_header = new HEADER();
   if ((buffer = (BYTE *)malloc(len + 8)) == (BYTE *)NULL) {
-    LOG(ERROR) << "Insufficient memory for EventIO_Object";
+    spdlog::error("Insufficient memory for EventIO_Object");
     exit(EXIT_FAILURE);
   }
   is_allocated = 1;
@@ -36,12 +35,12 @@ LAST_IO::EventIO_Object::EventIO_Object(string filename, unsigned long length) {
 
 LAST_IO::EventIO_Object::EventIO_Object(std::string filename, unsigned long length, std::string remote_url)
 {
-  LOG(INFO) << "Working at eos file system , Xrootd File Initialized";
+  spdlog::info("Working at eos file system , Xrootd File Initialized");
   filename = remote_url + filename;
   if(endsWith(filename, ".zst"))
   {
-    LOG(INFO) << "File is compressed with zstd";
-    input_file = new CXrdFile_Zst(filename);
+    spdlog::info("file is compressed with zstd");
+    //input_file = new CXrdFile_Zst(filename);
   }
   else {
     input_file  = new XrdFile(filename);
@@ -50,7 +49,7 @@ LAST_IO::EventIO_Object::EventIO_Object(std::string filename, unsigned long leng
   int len = 10000;
   sub_item_header = new HEADER();
   if ((buffer = (BYTE *)malloc(len + 8)) == (BYTE *)NULL) {
-    LOG(ERROR) << "Insufficient memory for EventIO_Object";
+    spdlog::error("Insufficient memory for EventIO_Object");
     exit(EXIT_FAILURE);
   }
   is_allocated = 1;
@@ -170,8 +169,7 @@ int LAST_IO::EventIO_Object::find_io_block() {
   item_level = 0;
 
   if (sync_count > 0) {
-    LOG(WARNING) << "Synchronization Error skipeed" << sync_count
-                 << " bytes of data";
+    spdlog::error("Synchronization Error skipeed {} bytes of data", sync_count);
   }
   return 0;
 }
@@ -197,13 +195,13 @@ int LAST_IO::EventIO_Object::extend_io_buffer(long increment) {
       increment = increment2;
   }
   if ((buflen + increment) > max_length) {
-    LOG(WARNING) << "Maximum length of I/O Buffer exceeded";
+    spdlog::warn("Maximum length of I/O Buffer exceeded");
     return -1;
   }
   long iffset = data - buffer;
   BYTE *typr;
   if ((typr = (BYTE *)realloc(buffer, buflen + increment)) == (BYTE *)NULL) {
-    LOG(WARNING) << "Insufficient memort for extending I/O block";
+    spdlog::warn("Insufficient memory for extending I/O block");
     return -1;
   } else {
     buffer = typr;
@@ -235,7 +233,7 @@ int LAST_IO::EventIO_Object::read_io_block() {
     int e4 = (item_extension[0] ? 4 : 0);
     if (buflen < (item_length[0] + 16 + e4)) {
       if (extend_io_buffer(item_length[0] + 16 + e4 - buflen) == -1) {
-        LOG(WARNING) << "I/O buffer is too small, the block is skipped";
+        spdlog::warn("Too small io buffer I/O skipped");
         /*
             Warning Too small io buffer I/O skipped
         */
@@ -295,7 +293,7 @@ int LAST_IO::EventIO_Object::next_subitem_type() {
   ilevel = item_level;
 
   if (ilevel >= max_level) {
-    LOG(WARNING) << "Maximum level of sub-items in I/O Buffer exceeded";
+    spdlog::warn("Maximum level of sub-items in I/O Buffer exceeded");
     r_remaining = -1;
   }
 
@@ -622,7 +620,7 @@ uintmax_t LAST_IO::EventIO_Object::get_count() {
            v[4];
 /* With only 32-bit integers available, we may lose data from here on. */
 #ifndef HAVE_64BIT_INT
-  LOG(WARNING)<<"Data clipped to 32 bits in get_count function.");
+  spdlog::warn("Data clipped to 32 bits in get_count function.");
 #endif
   v[5] = get_byte();
   if ((v[0] & 0xfc) == 0xf8)
@@ -796,12 +794,12 @@ int LAST_IO::EventIO_Object::get_item_begin() {
   /*               Top item                   */
   else if (ilevel == 0) {
     if (data_pending < 0) {
-      LOG(WARNING) << "You must get an I/O block before you read";
+      spdlog::warn("You must get an I/O block before you read");
       /* no IO block for reading*/
       return -1;
     }
     if (buffer == (BYTE *)NULL) {
-      LOG(ERROR) << "buffer is not allocated";
+      spdlog::warn("buffer is not allocated");
       return -1;
     }
     data = buffer;
@@ -917,8 +915,8 @@ int LAST_IO::EventIO_Object::get_item_end() {
     if (item_length[ilevel] !=
         (length = (long)(data - buffer) - item_start_offset[ilevel])) {
       if (length > item_length[ilevel]) {
-        LOG(WARNING) << "Actual length of item type" << item_header->type
-                     << "exceeds specified length";
+        spdlog::warn("Actual length of item type {} exceeds specified length",
+                     item_header->type);
       }
       data = buffer + item_start_offset[ilevel] + item_length[ilevel];
     }

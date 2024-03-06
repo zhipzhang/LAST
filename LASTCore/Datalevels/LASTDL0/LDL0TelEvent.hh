@@ -31,7 +31,8 @@ class LRDL0TelEvent :public TObject
                 true_image_pe = new Double32_t[num_pixels];
                 pix_pe = new Double32_t[num_pixels];
                 std::fill(pix_pe, pix_pe + num_pixels, 0);
-                pix_time = new Double32_t[num_pixels]{0};
+                pix_time = new Double32_t[num_pixels];
+                std::fill(pix_time, pix_time + num_pixels, 0);
             };
         void SetTruePixPe(int ipix, Double32_t true_pe)
         {

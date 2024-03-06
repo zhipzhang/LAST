@@ -1,4 +1,5 @@
 #include "LRDL0Event.hh"
+#include "spdlog/spdlog.h"
 
 
 LRDL0Event::LRDL0Event(const LJsonConfig& config, const char mode): cmd_config(config), LDL0Event()
@@ -84,7 +85,7 @@ void LRDL0Event::ReadROOTFile(std::string filename)
     }
     else
     {
-        LOG(ERROR) << "Can't find the directory " << dl0_dirname << " in file " << filename;
+        spdlog::error("Can't find the directory {} in file {}", dl0_dirname, filename);
     }
 }
 
@@ -102,7 +103,7 @@ bool LRDL0Event::ReadEvent()
         auto flag = dl0event_tree->GetEntryWithIndex(event_id, itel);
         if( flag == -1)
         {
-            LOG(ERROR) << "Can't find the event " << event_id << " in telescope " << itel;
+            spdlog::error("Can't find the event {} in telescope {}", event_id, itel);
             return false;
         }
         AddTelEvents(itel, dl0_tel_event);

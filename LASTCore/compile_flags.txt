@@ -1,8 +1,12 @@
 -xc++
--I 
-../LASTIO/
+-std
+c++11
 -I
-/usr/include/root/
+/usr/include
+-isystem
+/usr/include
+-I
+/data/home/zhipz/opt/root/include
 -I 
 /data/home/zhipz/local/include/xrootd/
 -I

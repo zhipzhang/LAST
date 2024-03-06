@@ -1,14 +1,13 @@
 #include "Datalevels/LASTDL1/LRDL1bEvent.hh"
 #include "reconstruction/LHillasReconstructor.hh"
 #include "Datalevels/LJsonConfig.hh"
-#include "glog/logging.h"
 #include "Datalevels/LASTDL1/LRDL1Event.hh"
+#include "spdlog/spdlog.h"
 
 
 int main(int argc, char** argv)
 {
-    google::InitGoogleLogging(argv[0]);
-    google::SetStderrLogging(google::GLOG_INFO);
+    spdlog::set_level(spdlog::level::info);
     LJsonConfig config(argc, argv);
 
     auto lasdtdl1 = new LRDL1Event(config, 'r');

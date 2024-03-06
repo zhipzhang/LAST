@@ -8,7 +8,6 @@
 #include "../LTelescopesTemplate.hh"
 #include <cstdint>
 #include <memory>
-#include "glog/logging.h"
 #include "LTelElectronic.hh"
 
 class LEventElectronic
@@ -20,7 +19,7 @@ class LEventElectronic
         void Clear() {telescopes_electronic->Clear();}
         std::shared_ptr<LTelescopes<std::shared_ptr<LRTelElectronic>>>  GetData() {return telescopes_electronic;}
         LEventElectronic(){ telescopes_electronic = std::make_shared<LTelescopes<std::shared_ptr<LRTelElectronic>>>();};
-        ~LEventElectronic(){LOG(INFO) << "delete LeventElectronic";}
+        ~LEventElectronic(){}
         std::shared_ptr<LTelescopes<std::shared_ptr<LRTelElectronic>>> telescopes_electronic;
     
 };

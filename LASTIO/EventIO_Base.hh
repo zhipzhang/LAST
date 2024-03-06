@@ -22,7 +22,6 @@
 #include "initial.h"
 #include <byteswap.h>
 #include <vector>
-#include "glog/logging.h"
 typedef unsigned char BYTE;
 using json = nlohmann::json;
 using string = std::string;

@@ -4,6 +4,8 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "LREventRaw.hh"
+#include "spdlog/common.h"
+#include "spdlog/spdlog.h"
 #include <memory>
 
 LREventRaw::LREventRaw(const LJsonConfig& cmd_config, const char mode): cmd_config(cmd_config),LEventRaw()
@@ -137,7 +139,7 @@ void LREventRaw::ReadROOTFile(std::string filename)
     }
     else
     {
-        LOG(ERROR) << "Can't find the directory " << dirname << " in file " << filename;
+        spdlog::error("Can't find the directory {} in file {}", dirname, filename);
     }
 }
 bool LREventRaw::ReadEvent()
@@ -158,7 +160,7 @@ bool LREventRaw::ReadEvent()
             auto flag_wave = waveform_tree->GetEntryWithIndex(event_id, itel);
             if (flag_true == -1)
             {
-                LOG(ERROR) << "Can't find the event " << event_id << " in telescope " << itel;
+                spdlog::error("Can't find the event {} in telescope {}", event_id, itel);
                 return false;
             }
 

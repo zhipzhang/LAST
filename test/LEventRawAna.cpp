@@ -4,13 +4,11 @@
 #include "TProfile.h"
 #include "Datalevels/LJsonConfig.hh"
 #include "reconstruction/LHillasGeometryReconstructor.hh"
-#include "glog/logging.h"
 #include <memory>
+#include "spdlog/spdlog.h"
 
 int main(int argc, char** argv)
 {
-    google::InitGoogleLogging(argv[0]);
-    google::SetStderrLogging(google::GLOG_INFO);
     LJsonConfig config(argc, argv);
     std::string output_fname = config.GetOutputFileName();
     if(config.GetOutputFileName().compare(0, 4, "/eos") == 0)

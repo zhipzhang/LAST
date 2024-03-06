@@ -7,9 +7,9 @@
 #include "TArray.h"
 #include "TKDTree.h"
 #include "TMatrixDSparsefwd.h"
-#include "glog/logging.h"
 #include "TArrayD.h"
 #include "TArrayI.h"
+#include "spdlog/spdlog.h"
 using std::string;
 LCameraGeometry::LCameraGeometry(string n, int num, double* x, double* y, double size, int shape)
 {
@@ -34,7 +34,7 @@ LCameraGeometry::LCameraGeometry(string n, int num, double* x, double* y, double
     }
     else 
     {
-        LOG(ERROR) << "Pixel shape not supported";
+        spdlog::error("Pixel shape not supported");
         exit(EXIT_FAILURE);
     }
     kdtree = new TKDTreeID(num_pix, 2, 1);
@@ -122,7 +122,7 @@ void LCameraGeometry::set_border_pixel(int depth)
     }
     else 
     {
-        LOG(WARNING) << "Depth > 2 is not supported yet";
+        spdlog::warn("Depth > 2 is not supported yet");
     }
         
 }
