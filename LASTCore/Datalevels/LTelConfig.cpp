@@ -1,5 +1,6 @@
 #include "LTelConfig.hh"
 #include "LCameraSet.hh"
+#include <algorithm>
 #include <memory>
 
 
@@ -23,4 +24,17 @@ LRTelescopeConfig::~LRTelescopeConfig()
     {
         delete [] pix_y;
     }
+}
+
+LRTelescopeConfig& LRTelescopeConfig::operator=(const LRTelescopeConfig &other)
+{
+    std::copy(other.pos, other.pos + 3, this->pos);
+    InitCameraSet(other.camera_name, other.tel_id, other.num_pixels);
+
+    std::copy(other.pix_x, other.pix_x + other.num_pixels, this->pix_x);
+    std::copy(other.pix_y, other.pix_y + other.num_pixels, this->pix_y);
+    this->pix_shape = other.pix_shape;
+    this->pix_size = other.pix_size;
+    this->focal_length = other.focal_length;
+    return *this;
 }

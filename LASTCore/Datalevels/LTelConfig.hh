@@ -46,6 +46,7 @@ class LRTelescopeConfig : public TObject
         pos[2] = z;
     }
     void InitCameraSet(std::string, int , int);
+    LRTelescopeConfig& operator=(const LRTelescopeConfig& other);
     //void InitOptics(std::string, int);
     ClassDef(LRTelescopeConfig, 6)
 };

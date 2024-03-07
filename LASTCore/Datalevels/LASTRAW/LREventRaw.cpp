@@ -173,7 +173,7 @@ bool LREventRaw::ReadEvent()
             event->AddTelImage(itel, rtel_true_image);
             if( HaveWaveform)
             {    
-                event->AddTelWaveform(itel, rtel_electronic);
+                //event->AddTelWaveform(itel, rtel_electronic);
             }
         }
         return true;
