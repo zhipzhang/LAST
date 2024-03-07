@@ -43,6 +43,7 @@ class LREventRaw : public LEventRaw
        TTree* arrayevent;
        int nevents;
        int ievents = 0;
+       int telescpe_flag = 0;
 
 
 

@@ -279,7 +279,7 @@ bool LEventRaw::ReadEvent()
 
 void LEvent::GetEventWaveform(AllHessData *hsdata)
 {
-    event_electronic->telescopes_electronic = std::make_shared<LTelescopes<std::shared_ptr<LRTelElectronic> > >();
+    event_electronic->telescopes_electronic->Clear(); 
     //event_electronic->telescopes_electronic = new LTelescopes<std::shared_ptr<LRTelElectronic> >();
     for(auto i = 0; i < hsdata->event.central.num_teldata;i++)
     {

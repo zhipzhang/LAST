@@ -32,7 +32,6 @@ class LTelElectronic
                 adc_known = new uint8_t[num_gains * num_pixels];
             }
         }
-
         ClassDef(LTelElectronic, 3)
 };
 

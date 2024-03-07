@@ -33,7 +33,6 @@ class LTelescopes
             }
             if(telescopes_dict.size() > 0)
             {
-                auto a = telescopes_dict[1];
                 telescopes_dict.clear();
             }
         }

@@ -109,7 +109,7 @@ class LJsonConfig
             quality_check = new LQualityCheck();
             writer_info = new DataWriterinfo();
         }
-        ~LJsonConfig(){};
+        ~LJsonConfig(){ delete quality_check; delete writer_info;};
         void ParseCommandLineFlags(int argc, char** argv);
         void ReadConfiguration();
         int  StereoQuery(const LRDL1TelEvent& dl1televent) const

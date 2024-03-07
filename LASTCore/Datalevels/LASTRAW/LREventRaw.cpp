@@ -104,9 +104,12 @@ void LREventRaw::StoreTTree()
 {
     ReadRunConfig();
     ReadTelConfig();
-    true_image_tree->BuildIndex("event_id", "tel_id");
-    if( cmd_config.WriteWaveform())
-        waveform_tree->BuildIndex("event_id", "tel_id");
+
+    //!! Be careful, the index of the tree is not built. (ROOT Xrootd is not support the index.)
+    //true_image_tree->BuildIndex("event_id", "tel_id");
+    //if( cmd_config.WriteWaveform())
+    //waveform_tree->BuildIndex("event_id", "tel_id");
+
     WriteConfig(rootfile.get());
     event_dir->cd();
     true_image_tree->Write();
@@ -156,21 +159,22 @@ bool LREventRaw::ReadEvent()
         event->Clear();
         for( const auto itel: event->event_shower->trigger_tels)
         {
-            auto flag_true = true_image_tree->GetEntryWithIndex(event_id, itel);
-            auto flag_wave = waveform_tree->GetEntryWithIndex(event_id, itel);
-            if (flag_true == -1)
+            true_image_tree->GetEntry(telescpe_flag);
+            if( waveform_tree->GetEntry(telescpe_flag) != -1)
+            {
+                HaveWaveform = true;
+            }
+            telescpe_flag++;
+            if(rtel_true_image->event_id != event_id || rtel_true_image->tel_id != itel)
             {
                 spdlog::error("Can't find the event {} in telescope {}", event_id, itel);
                 return false;
             }
-
             event->AddTelImage(itel, rtel_true_image);
-            if( flag_wave != -1)
+            if( HaveWaveform)
             {    
                 event->AddTelWaveform(itel, rtel_electronic);
-                HaveWaveform = true;
             }
-
         }
         return true;
 
