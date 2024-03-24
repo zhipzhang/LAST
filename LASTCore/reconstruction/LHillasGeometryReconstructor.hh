@@ -9,14 +9,12 @@
 #include  <map>
 #include <memory>
 #include <unordered_map>
-#include "Image/LHillasParameters.hh"
 #include "Datalevels/LTelescopesTemplate.hh"
 class LHillasGeometryReconstructor 
 {
     public:
-    LHillasGeometryReconstructor(const LJsonConfig& config): cmd_config(config){};
+    LHillasGeometryReconstructor(){};
     virtual ~LHillasGeometryReconstructor(){};
-    const LJsonConfig& cmd_config;
     static inline double ComputeImpactdistance(double* tel_pos, double altitude, double azimuth, double x, double y)
         {
             double cx = cos(altitude)*cos(azimuth);

@@ -6,7 +6,7 @@
 #include <memory>
 #include "../LTelescopesTemplate.hh"
 #include "../LShower.hh"
-#include "Image/LHillasParameters.hh"
+#include "LHillasParameters.hh"
 #include "LDL1TelEvent.hh"
 
 class LDL1Event : public LDataBase

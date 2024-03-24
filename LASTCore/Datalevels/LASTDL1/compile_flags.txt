@@ -1,6 +1,8 @@
 -xc++
 --std
 c++11
+-I
+./
 -I 
 ../LASTIO/
 -I
@@ -10,15 +12,13 @@ c++11
 -I
 /data/home/zhipz/local/include/nlohmann
 -I
-/data/home/zhipz/local/include/
--I
 /data/home/zhipz/ExternalLib/spdlog/include
 -I
 ./Konrad_hessio
 -I
 /data/home/zhipz/MyCode/LAST/LASTCore
 -I
-/data/home/zhipz/MyCode/LAST/ExternalLib/include
+/data/home/zhipz/MyCode/LAST/ExternalLib
 -I 
 /data/home/zhipz/MyCode/LAST/LASTIO
 -stdlib++-isystem

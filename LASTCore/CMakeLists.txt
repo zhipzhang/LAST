@@ -1,1 +1,5 @@
+set(COREDIR ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)
+set(COREDIR ${CMAKE_CURRENT_SOURCE_DIR} )
 add_subdirectory(Datalevels)
+add_subdirectory(Image)
+add_subdirectory(reconstruction)

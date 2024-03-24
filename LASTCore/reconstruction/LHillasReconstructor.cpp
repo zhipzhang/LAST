@@ -1,13 +1,11 @@
 #include "LHillasReconstructor.hh"
-#include "Datalevels/LASTDL1/LDL1bEvent.hh"
-#include "Datalevels/LASTDL1/LDL1bTelEvent.hh"
-#include "Image/LHillasParameters.hh"
 #include "TMath.h"
 #include "TMatrixTSparse.h"
 #include <algorithm>
 #include <memory>
 #include <utility>
 #include "eigen3/Eigen/Dense"
+#include "spdlog/spdlog.h"
 
 void LHillasReconstructor::AddTelPoint(int tel_id, double tel_alt, double tel_az)
 {
@@ -19,7 +17,7 @@ void LHillasReconstructor::SetRecTels(const LDL1Event& dl1event)
     tel_pointing_direction.clear();
     for(auto itel: dl1event.GetTelList())
     {
-        if(cmd_config.StereoQuery(dl1event[itel]))
+        if(cmd_config.StereoQuery(dl1event[itel].GetSize(), dl1event[itel].GetWidth(), dl1event[itel].GetLeakage1(), dl1event[itel].GetLeakage2()))
         {
             reconstruct_tel.push_back(itel);
             AddTelPoint(itel, dl1event[itel].tel_alt, dl1event[itel].tel_az);
@@ -87,17 +85,17 @@ void LHillasReconstructor::Direction_Reconstruction(LDL1bEvent& ldl1bevent)
     std::vector<double> sy_weight;
     std::vector<double> weight;
     double tmp_x, tmp_y, tmp_ang;
-    for(auto itel: reconstruct_tel)
+    spdlog::info("Reconstructing the direction of the shower, ntel is {}", reconstruct_tel.size());
+    for(int i = 0; i < reconstruct_tel.size(); i++)
     {
-        for(auto jtel: reconstruct_tel)
+        for(int j = i; j < reconstruct_tel.size(); j++)
         {
-            if(itel == jtel)
-            {
-                continue;
-            }
+            int itel = reconstruct_tel[i];
+            int jtel = reconstruct_tel[j];
             if(intersect_lines(hillas_dict[itel].GetCogx(), hillas_dict[itel].GetCogy(), hillas_dict[itel].GetPsi(), 
                 hillas_dict[jtel].GetCogx(), hillas_dict[jtel].GetCogy(), hillas_dict[jtel].GetPsi(), &tmp_x, &tmp_y, &tmp_ang) == 1)
             {
+                spdlog::info("Reconstructing the direction of the shower: x: {}, y: {}, ang: {}, itel{}, jtel{}", tmp_x, tmp_y, tmp_ang, itel, jtel);
                 sx_weight.push_back(tmp_x);
                 sy_weight.push_back(tmp_y);
                 double scale_size = (hillas_dict[itel].GetSize() * hillas_dict[jtel].GetSize())/(hillas_dict[itel].GetSize() + hillas_dict[jtel].GetSize());
@@ -117,7 +115,6 @@ void LHillasReconstructor::Direction_Reconstruction(LDL1bEvent& ldl1bevent)
 
     Eigen::VectorXd x_variance_weight = (eigen_sx.array() - rec_x).square();
     Eigen::VectorXd y_variance_weight = (eigen_sy.array() - rec_y).square();
-
     rec_x_uncertainty = (eigen_weight.dot(x_variance_weight)/eigen_weight.sum());
     rec_y_uncertainty = (eigen_weight.dot(y_variance_weight)/eigen_weight.sum());
     double rec_az, rec_alt = 0;
@@ -131,14 +128,12 @@ void LHillasReconstructor::Core_Reconstruction(LDL1bEvent& ldl1bevent)
     std::vector<double> sy_weight;
     std::vector<double> weight;
     double tmp_x, tmp_y, tmp_ang;
-    for(auto itel: reconstruct_tel)
+    for(int i = 0; i < reconstruct_tel.size(); i++)
     {
-        for(auto jtel: reconstruct_tel)
+        for(int j = i + 1; j < reconstruct_tel.size(); j++)
         {
-            if(itel == jtel)
-            {
-                continue;
-            }
+            int itel = reconstruct_tel[i];
+            int jtel = reconstruct_tel[j];
             if(intersect_lines(tiled_tel_pos[itel].first, tiled_tel_pos[itel].second, hillas_dict[itel].GetPsi(), 
                 tiled_tel_pos[jtel].first, tiled_tel_pos[jtel].second, hillas_dict[jtel].GetPsi(), &tmp_x, &tmp_y, &tmp_ang) == 1)
             {

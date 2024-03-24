@@ -1,0 +1,5 @@
+set(RAWHEADERFS  ${TELRAWLINKFS} PARENT_SCOPE)
+set(RAWSRC   ${TELRAWSRCS} LEventRaw.cpp LREventRaw.cpp) 
+add_library(LASTRAW STATIC ${RAWSRC})
+target_link_libraries(LASTRAW PUBLIC LASTIO BASE)
+target_include_directories(LASTRAW PUBLIC ${ROOT_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR} )

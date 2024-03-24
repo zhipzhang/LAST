@@ -36,7 +36,8 @@ class LCameraGeometry{
         const double GetXPix(int pix_id)const {return pix_x[pix_id];}
         const double GetYpix(int pix_id)const {return pix_y[pix_id];}
         std::vector<int> GetPixNeighbor(int pix_id) const;
-        void FillCogPixels(double cog_x, double cog_y,  std::vector<int>& cog_pix);
+        void FillCogPixels(double cog_x, double cog_y, double f,std::vector<int>& cog_pix);
+        void FillCorePixels(double cog_x, double cog_y, double f,double psi, double length, double width, std::vector<int>& core_pix);
         int  GetPixNum() const {return num_pix;};
     private:
         std::string name;

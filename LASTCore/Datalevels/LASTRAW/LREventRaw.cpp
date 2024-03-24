@@ -1,3 +1,4 @@
+#include "../LJsonConfig.hh"
 #include "LEventRaw.hh"
 #include "SimTel_File.hh"
 #include "TDirectory.h"
@@ -45,6 +46,10 @@ LREventRaw::LREventRaw(const LJsonConfig& cmd_config, std::string filename): cmd
     ReadROOTFile(input_fname);
 }
 
+LREventRaw::LREventRaw(const LJsonConfig& cmd_cfg):cmd_config(cmd_cfg), LEventRaw()
+{
+    spdlog::info("LReventRaw: Initialize for multiple files");
+}
 void LREventRaw::InitRootFile()
 {
     if( output_fname.empty())
@@ -159,22 +164,18 @@ bool LREventRaw::ReadEvent()
         event->Clear();
         for( const auto itel: event->event_shower->trigger_tels)
         {
-            true_image_tree->GetEntry(telescpe_flag);
-            if( waveform_tree->GetEntry(telescpe_flag) != -1)
-            {
-                HaveWaveform = true;
-            }
-            telescpe_flag++;
+            true_image_tree->GetEntry(telescpe_flag++);
+            //if( waveform_tree->GetEntry(telescpe_flag) != -1)
+            //{
+            //    HaveWaveform = true;
+            //}
             if(rtel_true_image->event_id != event_id || rtel_true_image->tel_id != itel)
             {
                 spdlog::error("Can't find the event {} in telescope {}", event_id, itel);
                 return false;
             }
-            event->AddTelImage(itel, rtel_true_image);
-            if( HaveWaveform)
-            {    
+            event->AddTelImage(itel, *rtel_true_image);
                 //event->AddTelWaveform(itel, rtel_electronic);
-            }
         }
         return true;
 

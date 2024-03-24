@@ -4,3 +4,6 @@ build*/
 tmp_build/
 PyLast/
 TMP/
+bin/
+lib/
+/**/compiled_flags.txt

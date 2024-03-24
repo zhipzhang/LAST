@@ -180,7 +180,7 @@ void LDataBase::WriteConfig(TFile* f)
         runconfig_tree = new TTree("runconfig", "runconfig", 99, simulation_config_dir);
         runconfig_tree->Branch("runconfig", &run_config);
         runconfig_tree->Fill();
-        //runconfig_tree->Write();
+        runconfig_tree->Write();
     }
     else 
     {
@@ -202,7 +202,7 @@ void LDataBase::WriteConfig(TFile* f)
     else {
         spdlog::warn("Can't mkdir instrument directory in file {}", f->GetName());
     }
-    //telconfig_tree->Write();
+    telconfig_tree->Write();
 
 }
 void LDataBase::WriteShower(TFile* f)
@@ -214,7 +214,7 @@ void LDataBase::WriteShower(TFile* f)
             shower_tree = new TTree("shower", "shower event",99, simulation_shower_dir);
         else
             spdlog::warn("Can't mkdir simulation shower directory in file {}", f->GetName());
-        shower_tree->Branch("shower", &ishower);
+        shower_tree->Branch("shower_info", &ishower);
     }
     ishower = shower.get();
     shower_tree->Fill();
@@ -227,12 +227,34 @@ LDataBase::LDataBase()
     ishower = new LRShower();
     itel_config = new LRTelescopeConfig();
 }
+void LDataBase::Init2Poly(TH2Poly* th2poly, int itel)
+{
+    if(th2poly->IsZombie())
+    {
+        spdlog::error("TH2Poly is zombie");
+        return;
+    }
+    auto tmpconfig = (*tel_config)[itel];
+    for(int ipix = 0;ipix < tmpconfig->num_pixels; ipix++)
+    {
+        double pix_size = tmpconfig->pix_size /tmpconfig->focal_length;
+        double x = tmpconfig->pix_x[ipix] / tmpconfig->focal_length;
+        double y = tmpconfig->pix_y[ipix] / tmpconfig->focal_length;
+        double bin_x[4] = {x - pix_size/2, x + pix_size/2, x + pix_size/2, x - pix_size/2};
+        double bin_y[4] = {y - pix_size/2, y - pix_size/2, y + pix_size/2, y + pix_size/2};
+        th2poly->AddBin(4, bin_x, bin_y);
+    }
+
+}
 void LDataBase::Close()
 {
     tel_config->Clear();
-    delete itel_config;
-    delete ishower;
-    delete run_config;
+    itel_config = nullptr;
+    ishower = nullptr;
+    itel_config = nullptr;
+    telconfig_tree = nullptr;
+    runconfig_tree = nullptr;
+    runconfig_tree = nullptr;
 }
 LDataBase::~LDataBase()
 {

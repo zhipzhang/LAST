@@ -110,3 +110,10 @@ bool LRDL0Event::ReadEvent()
     }
     return true;
 }
+
+void LRDL0Event::DrawEvent(int ievent, int itel)
+{
+    auto itel_config = (*tel_config)[itel];
+    
+
+}

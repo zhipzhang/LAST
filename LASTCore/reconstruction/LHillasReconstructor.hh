@@ -1,13 +1,11 @@
 #include "Datalevels/LASTDL1/LDL1TelEvent.hh"
 #include "Datalevels/LASTDL1/LDL1bEvent.hh"
-#include "Datalevels/LDataBase.hh"
-#include "Datalevels/LShower.hh"
 #include "Datalevels/LTelescopesTemplate.hh"
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include "Image/LHillasParameters.hh"
-#include "reconstruction/LHillasGeometryReconstructor.hh"
+#include "Datalevels/LASTDL1/LHillasParameters.hh"
+#include "LHillasGeometryReconstructor.hh"
 #include <memory>
 #include "Datalevels/LASTDL1/LDL1Event.hh"
 
@@ -15,7 +13,7 @@ class  LHillasReconstructor: public LHillasGeometryReconstructor
 {
     public: 
         LHillasReconstructor();
-        LHillasReconstructor(const LJsonConfig& config): LHillasGeometryReconstructor(config){};
+        LHillasReconstructor(const LJsonConfig& config): cmd_config(config){};
         virtual ~LHillasReconstructor(){};
         bool ProcessEvent(const LDL1Event& dl1event, LDL1bEvent& dl1bevent);                            // process the event
         void Init(const LDataBase& dl1event)
@@ -23,6 +21,7 @@ class  LHillasReconstructor: public LHillasGeometryReconstructor
             SetTelConfig(dl1event);
         }
     private:
+        const LJsonConfig& cmd_config;
         void SetRecTels(const LDL1Event& dl1event);
         void SetPointing(const LDL1Event& dl1event)
         {

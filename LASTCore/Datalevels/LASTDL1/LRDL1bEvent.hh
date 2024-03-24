@@ -14,8 +14,8 @@
  #define _LRDL1bEvent_HH
 
 
-#include "Datalevels/LASTDL1/LDL1bTelEvent.hh"
-#include "Datalevels/LJsonConfig.hh"
+#include "LDL1bTelEvent.hh"
+#include "../LJsonConfig.hh"
 #include "LDL1bEvent.hh"
 #include "TDirectory.h"
 #include "TFile.h"

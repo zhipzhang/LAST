@@ -1,4 +1,32 @@
 {
-	"EOS_URL":"root://eos01.ihep.ac.cn/",
-	"MAX_IO_LENGTH": 100000000000
+	"DataWriter": {
+		"Owner": {
+			"name": "Zhipeng Zhang",
+			"email": "zhipzhang@mail.ustc.edu.cn",
+			"organization": "USTC"
+		},
+		"write_config": true,
+		"write_showers": true,
+		"remote_files": false,
+		"write_waveforms": true,
+		"write_true_pe": true,
+		"remote_url":"root://eos01.ihep.ac.cn/"
+	},
+	"ImageProcessor":{
+		"image_cleaner_type": "TailCutsClean",
+		"LTailCutsCleaner" :{
+			"picture_threshold_pe": 5,
+			"boundary_threshold_pe": 2,
+			"min_picture_neighbors": 2
+		}
+	},
+	"LImageQuality":{
+		"num_pixels" : 3,
+		"min_size"   : 50
+	},
+	"ShowerProcesser":{
+		"reconstructor_types": ["LHillasReconstructor"]
+	},
+	"MAX_IO_LENGTH": 100000000000,
+	"Camera_Name" : "LASTCamera"
 }

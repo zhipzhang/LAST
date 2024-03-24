@@ -1,5 +1,5 @@
 #include "LRDL1Event.hh"
-#include "Datalevels/LShower.hh"
+#include "../LShower.hh"
 #include "spdlog/spdlog.h"
 
 LRDL1Event::LRDL1Event(const LJsonConfig& cfg, const char mode): cmd_config(cfg), LDL1Event()
@@ -19,7 +19,7 @@ void LRDL1Event::InitRootFile()
 {
     if(outname.empty())
     {
-        outname = cmd_config.GetUrl() + cmd_config.GetOutputFileName();
+        outname =  cmd_config.GetOutputFileName();
     }
     root_file.reset(TFile::Open(outname.c_str(), "RECREATE"));
     dl1_dir = root_file->mkdir(dl1_dirname);
@@ -45,7 +45,7 @@ void LRDL1Event::ReadROOTFile(std::string filename)
         arrayevent    = dl1_dir->Get<TTree>("arrayevent");
         dl1event_tree->SetBranchAddress("dl1_tel_event", &dl1_tel_event);
         arrayevent->SetBranchAddress("arrayevent", &ldl1array);
-        nevents = dl1event_tree->GetEntries();
+        nevents = arrayevent->GetEntries();
     }
     else 
     {
@@ -58,14 +58,17 @@ bool LRDL1Event::ReadEvent()
 {
         if( ievents >= nevents)
         {
+            spdlog::info("{} events have been read {}", nevents, ievents);
             return false;
         }
-        dl1event_tree->GetEntry(ievents++);
-        arrayevent->GetEntry(ievents);
+        spdlog::info("Reading event {}", ievents);
+        arrayevent->GetEntry(ievents++);
         ldl1event->Clear();
         for( const auto itel: ldl1array->trigger_tels)
         {
             auto flag = dl1event_tree->GetEntryWithIndex(ldl1array->event_id, itel);
+                spdlog::info("Can't find the event {} in telescope {}", ldl1array->event_id, itel);
+
             if( flag == -1)
             {
                 spdlog::error("Can't find the event {} in telescope {}", ldl1array->event_id, itel);

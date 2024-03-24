@@ -12,7 +12,7 @@
 
  #ifndef _LRDL1_EVENT_HH_
  #define _LRDL1_EVENT_HH_
-#include "Datalevels/LJsonConfig.hh"
+#include "../LJsonConfig.hh"
 #include "LDL1Event.hh"
  class LRDL1Event: public LDL1Event 
  {

@@ -9,16 +9,16 @@
 #include "TObject.h"
 #include <memory>
 #include <string>
-#include "LEventElectronic.hh"
 #include "../LSimulationImage.hh"
 #include "TFile.h"
 #include "TDirectory.h"
 class LREventRaw : public LEventRaw
 {
     public:
-        LREventRaw(const LJsonConfig& cmd_config, const char mode = 'w');
+        LREventRaw(const LJsonConfig& cmd_config, const char mode);
 
         LREventRaw(const LJsonConfig& cmd_config, std::string filename); // Read File When Analysis Constructor.
+        LREventRaw(const LJsonConfig& cmd_config);
         virtual ~LREventRaw();
 
         void InitRootFile();   // Open the root file and create the directory and tree.

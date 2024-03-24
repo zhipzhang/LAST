@@ -4,8 +4,9 @@
 #ifndef _LDL1TelEvent_HH
 #define _LDL1TelEvent_HH
 
-#include "Image/LHillasParameters.hh"
+#include "LHillasParameters.hh"
 #include "RtypesCore.h"
+#include "TObject.h"
 class LRDL1TelEvent : public TObject
 {
     protected:
@@ -65,6 +66,18 @@ class LRDL1TelEvent : public TObject
     double GetCogy() const
     {
         return hillas.GetCogy();
+    }
+    double GetPsi() const
+    {
+        return hillas.GetPsi();
+    }
+    double GetLength() const
+    {
+        return hillas.GetLength();
+    }
+    double GetWidth() const
+    {
+        return hillas.GetWidth();
     }
     void SetConcentration(Double32_t cog_size, Double32_t core_size, Double32_t max_size)
     {
@@ -130,10 +143,6 @@ class LRDL1TelEvent : public TObject
     double GetSize() const
     {
         return hillas.GetSize();
-    }
-    double GetWidth() const
-    {
-        return hillas.GetWidth();
     }
     double GetLeakage1() const
     {

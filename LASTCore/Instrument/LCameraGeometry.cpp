@@ -148,13 +148,30 @@ std::ostream& operator<<(std::ostream& os, const LCameraGeometry& cam)
     os << "Pixel Size: " << cam.pix_size << std::endl;
     return os;
 };
-void LCameraGeometry::FillCogPixels(double cog_x, double cog_y, std::vector<int> &cog_pix)
+void LCameraGeometry::FillCogPixels(double cog_x, double cog_y,double f, std::vector<int> &cog_pix)
 {
     for(int ipix = 0; ipix < num_pix; ipix++)
     {
-        if( (pix_x[ipix] - cog_x) * (pix_x[ipix] - cog_x) + (pix_y[ipix] - cog_y) * (pix_y[ipix] - cog_y) < pix_size * pix_size)
+        if( ((pix_x[ipix]/f - cog_x) * (pix_x[ipix]/f - cog_x) + (pix_y[ipix]/f - cog_y) * (pix_y[ipix]/f - cog_y)) < pix_size/f * pix_size/f)
         {
             cog_pix.push_back(ipix);
+        }
+    }
+}
+
+void LCameraGeometry::FillCorePixels(double cog_x, double cog_y, double f,double psi, double length, double width,std::vector<int> &core_pix)
+{
+    for(int ipix = 0; ipix < num_pix; ipix++)
+    {
+        double delta_x = pix_x[ipix]/f - cog_x;
+        double delta_y = pix_y[ipix]/f - cog_y;
+        double cos_psi = cos(psi);
+        double sin_psi = sin(psi);
+        double longi = delta_x * cos_psi + delta_y * sin_psi;
+        double trans = delta_x * -sin_psi + delta_y * cos_psi;
+        if((pow(longi, 2)/pow(length, 2) + pow(trans, 2)/pow(width, 2)) <= 1)
+        {
+            core_pix.push_back(ipix);
         }
     }
 }

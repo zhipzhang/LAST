@@ -3,10 +3,9 @@
 #ifndef _LJSONCONFIG_HH
 #define _LJSONCONFIG_HH
 #include <string>
-#include "Image/LCleaning.hh"
 #include "gflags/gflags.h"
 #include "nlohmann/json.hpp"
-#include "./LASTDL1/LDL1TelEvent.hh"
+#include <iostream>
 #include <sstream>
 
 /**
@@ -33,25 +32,25 @@ struct LQualityCheck
     double max_leakage1 = -1;
     double max_leakage2 = -1;
     //bool   CheckImageprocess();
-    int  CheckReconstructTel(const LRDL1TelEvent& dl1televent)
+    int  CheckReconstructTel(double size, double width, double leakage1, double leakage2)
     {
         if(min_size > 0)
         {
-            if(dl1televent.GetSize() < min_size)
+            if(size < min_size)
             {
                 return 0;
             }
         }
-        if(dl1televent.GetWidth() < min_width)
+        if(width < min_width)
         {
             return 0;
         }
         
-        if(max_leakage1 > 0 && dl1televent.GetLeakage1() > max_leakage1)
+        if(max_leakage1 > 0 && leakage1 > max_leakage1)
         {
             return 0;
         }
-        if(max_leakage2 > 0 && dl1televent.GetLeakage2() > max_leakage2)
+        if(max_leakage2 > 0 && leakage2 > max_leakage2)
         {
             return 0;
         }
@@ -112,9 +111,9 @@ class LJsonConfig
         ~LJsonConfig(){ delete quality_check; delete writer_info;};
         void ParseCommandLineFlags(int argc, char** argv);
         void ReadConfiguration();
-        int  StereoQuery(const LRDL1TelEvent& dl1televent) const
+        int  StereoQuery(double size, double width, double leakage1, double leakage2) const
         {
-            return quality_check->CheckReconstructTel(dl1televent);
+            return quality_check->CheckReconstructTel(size, width, leakage1, leakage2);
         }
         std::string GetInputFileName() const
         {

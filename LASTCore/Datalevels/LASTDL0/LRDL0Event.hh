@@ -16,6 +16,10 @@
  #include <string>
  #include "TDirectory.h"
  #include "TFile.h"
+ #include "../LJsonConfig.hh"
+ #include "TCanvas.h"
+ #include "TH2Poly.h"
+
  class LRDL0Event: public LDL0Event
  {
         public:
@@ -28,6 +32,7 @@
             bool ReadEvent();    // Read Events from TTree.
             TFile* GetRootFile() {return root_file.get();};
             virtual ~LRDL0Event(){};
+            void DrawEvent(int ievent, int itel);
         private:
             int nevents;
             const LJsonConfig& cmd_config;

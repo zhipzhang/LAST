@@ -46,6 +46,8 @@ LRTelTrueImage& LRTelTrueImage::operator=(const LRTelTrueImage& other)
         tel_alt = other.tel_alt;
         tel_az  = other.tel_az;
         tel_id = other.tel_id;
+        time_spread1 = other.time_spread1;
+        time_spread2 = other.time_spread2;
         return *this;
 }
 

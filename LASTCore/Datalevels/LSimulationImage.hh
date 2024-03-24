@@ -21,8 +21,7 @@ class LSimulationImage
         void Clear(){telescopes_true_image->Clear();};
         std::shared_ptr<LTelescopes<std::shared_ptr<LRTelTrueImage>>> GetData() {return telescopes_true_image;}
         const std::vector<int> GetTelList(){return telescopes_true_image->GetKeys();}
-        void AddTelImage(int tel_id, LRTelTrueImage* tel_image);
-        void AddTelImage(int tel_id, std::shared_ptr<LRTelTrueImage> t){telescopes_true_image->AddTel(tel_id, t);}
+        void AddTelImage(int tel_id, const LRTelTrueImage& tel_image);
         LRTelTrueImage* GetTelImage(int tel_id){return ((*telescopes_true_image)[tel_id]).get();}
         //std::shared_ptr<LTelescopes<std::shared_ptr<LRTelTrueImage>>> telescopes_true_image;
         std::shared_ptr<LTelescopes<std::shared_ptr<LRTelTrueImage>>> telescopes_true_image;

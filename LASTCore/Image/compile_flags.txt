@@ -1,18 +1,12 @@
--std=c++14
+-std=c++11
 -I 
-../LASTIO/
+/data/home/zhipz/MyCode/LAST/LASTCore/Datalevels/LASTDL1
+-I
+/data/home/zhipz/MyCode/LAST/LASTCore/Datalevels/LASTDL0
+-I
+/data/home/zhipz/MyCode/LAST/ExternalLib
+-I
+../
 -I
 /data/home/zhipz/opt/root/include
--I 
-/data/home/zhipz/local/include/xrootd/
--I
-/data/home/zhipz/local/include/nlohmann
--I
-/data/home/zhipz/local/include/
--I
-./Konrad_hessio
--I
-/data/home/zhipz/MyCode/LAST/LASTCore
--I
-/data/home/zhipz/MyCode/LAST/ExternalLib/include
 

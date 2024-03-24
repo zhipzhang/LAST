@@ -26,6 +26,7 @@
 #include "TDirectory.h"
 #include "TTree.h"
 #include "TFile.h"
+#include "TH2Poly.h"
 
 class LDataBase
 {
@@ -56,6 +57,7 @@ class LDataBase
         TDirectory* simulation_config_dir = nullptr;     // When Write, it's directory what we write to; when Read, it's directory what we read from
         TDirectory* instrument_dir = nullptr;            // When Write, it's directory what we write to; when Read, it's directory what we read from
         void Close();
+        void Init2Poly(TH2Poly* th2poly, int itel);
 
     private:
         void CopyDirectory(TDirectory* source, TDirectory* dest);

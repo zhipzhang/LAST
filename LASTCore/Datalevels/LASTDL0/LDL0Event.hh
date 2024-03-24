@@ -16,7 +16,6 @@
 2024.01.07 : Now, DL0 event should at least can implement the only_tel functions.
 */
 
-#include "../LASTRAW/LEventRaw.hh"
 #include "../LDataBase.hh"
 #include <memory>
 #include <unordered_map>
@@ -24,6 +23,7 @@
 #include "../LSimulationImage.hh"
 #include "../LShower.hh"
 #include "LDL0TelEvent.hh"
+#include "../LEvent.hh"
 class LDL0Event  : public LDataBase
 {
     protected:

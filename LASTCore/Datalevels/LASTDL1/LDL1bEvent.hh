@@ -11,9 +11,9 @@
 
 #ifndef _LDL1bEvent_HH
 #define _LDL1bEvent_HH
-#include "Datalevels/LASTDL1/LDL1bTelEvent.hh"
-#include "Datalevels/LShower.hh"
-#include "Datalevels/LTelescopesTemplate.hh"
+#include "LDL1bTelEvent.hh"
+#include "../LShower.hh"
+#include "../LTelescopesTemplate.hh"
 #include "LDL1bArrayEvent.hh"
 #include <memory>
 class LDL1bEvent

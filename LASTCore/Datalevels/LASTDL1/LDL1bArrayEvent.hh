@@ -12,7 +12,7 @@
  #ifndef _LDL1bArrayEvent_HH
  #define _LDL1bArrayEvent_HH
 
- #include "Datalevels/LShower.hh"
+ #include "../LShower.hh"
 #include "RtypesCore.h"
 class LDL1bArrayEvent: public LRArray
 {

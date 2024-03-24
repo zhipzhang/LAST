@@ -1,11 +1,36 @@
 set(LINKDIR ${CMAKE_CURRENT_SOURCE_DIR}/LinkDefDir)
-set(HEADERFS LShower.hh LASTRAW/LTelElectronic.hh  LTelTrueImage.hh LSimulationConfig.hh LCameraSet.hh LTelConfig.hh  LASTDL0/LDL0TelEvent.hh LASTDL1/LDL1TelEvent.hh ${CMAKE_SOURCE_DIR}/LASTCore/Image/LHillasParameters.hh LASTDL1/LDL1bArrayEvent.hh LASTDL1/LDL1bTelEvent.hh)
-set(DLSources LASTRAW/LEventRaw.cpp LASTRAW/LREventRaw.cpp LASTRAW/LEventElectronic.cpp LDataBase.cpp LJsonConfig.cpp
-	LTelConfig.cpp LSimulationImage.cpp LCameraSet.cpp LASTDL0/LDL0Event.cpp LASTDL0/LRDL0Event.cpp LASTDL0/LDL0TelEvent.cpp 
-	LASTRAW/LTelElectronic.cpp LTelTrueImage.cpp LASTDL1/LDL1Event.cpp LASTDL1/LRDL1Event.cpp LASTConverter/LImageProcessor.cpp 
-	${CMAKE_SOURCE_DIR}/LASTCore/Image/LHillasParameters.cpp ${CMAKE_SOURCE_DIR}/LASTCore/Image/LCleaning.cpp ${CMAKE_SOURCE_DIR}/LASTCore/Instrument/LCameraGeometry.cpp  LASTDL1/LDL1bEvent.cpp LASTDL1/LRDL1bEvent.cpp ${CMAKE_SOURCE_DIR}/LASTCore/reconstruction/LHillasReconstructor.cpp)
-add_library(DLs STATIC ${DLSources})
-target_link_libraries(DLs PUBLIC LASTIO)
-target_link_libraries(DLs PUBLIC spdlog::spdlog_header_only gflags::gflags nlohmann_json::nlohmann_json  ${ROOT_LIBRARIES})
-target_include_directories(DLs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/LASTRAW ${ROOT_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/LASTDL0 ${CMAKE_SOURCE_DIR}/LASTCore ${CMAKE_SOURCE_DIR}/ExternalLib ${CMAKE_CURRENT_SOURCE_DIR}/LASTDL1)
-ROOT_GENERATE_DICTIONARY(LDLs_dict ${HEADERFS} MODULE DLs LINKDEF ${LINKDIR}/LDLsLinkDef.h)
+set(BASELINKFS ${CMAKE_CURRENT_SOURCE_DIR}/LShower.hh ${CMAKE_CURRENT_SOURCE_DIR}/LSimulationConfig.hh 
+    ${CMAKE_CURRENT_SOURCE_DIR}/LTelConfig.hh ${CMAKE_CURRENT_SOURCE_DIR}/LSimulationConfig.hh)
+set(TELRAWLINKFS ${CMAKE_CURRENT_SOURCE_DIR}/LTelTrueImage.hh ${CMAKE_CURRENT_SOURCE_DIR}/LTelElectronic.hh)
+set(TELRAWSRCS ${CMAKE_CURRENT_SOURCE_DIR}/LTelTrueImage.cpp ${CMAKE_CURRENT_SOURCE_DIR}/LTelElectronic.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/LSimulationImage.cpp  ${CMAKE_CURRENT_SOURCE_DIR}/LEventElectronic.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/LEvent.cpp)
+set(BASESRC ${CMAKE_CURRENT_SOURCE_DIR}/LDataBase.cpp ${CMAKE_CURRENT_SOURCE_DIR}/LJsonConfig.cpp 
+     ${CMAKE_CURRENT_SOURCE_DIR}/LTelConfig.cpp )
+
+#set(BASEDICTFILE ${CMAKE_CURRENT_BINARY_DIR}/LBASEDICT.cxx)
+add_library(BASE STATIC)
+target_sources(BASE PRIVATE ${BASESRC})
+target_include_directories(BASE PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${ROOT_INCLUDE_DIRS})
+target_link_libraries(BASE PUBLIC  spdlog::spdlog_header_only gflags::gflags nlohmann_json::nlohmann_json  ${ROOT_LIBRARIES})
+ROOT_GENERATE_DICTIONARY(BASEDICT ${BASELINKFS} MODULE BASE LINKDEF ${LINKDIR}/LBaseLinkDef.h)
+
+add_subdirectory(LASTRAW)
+add_subdirectory(LASTDL0)
+add_subdirectory(LASTDL1)
+
+ROOT_GENERATE_DICTIONARY(RAWDICT ${RAWHEADERFS} MODULE LASTRAW LINKDEF ${LINKDIR}/LRawLinkDef.h)
+ROOT_GENERATE_DICTIONARY(DL0DICT ${DL0HEADERFS} MODULE LASTDL0 LINKDEF ${LINKDIR}/LDL0LinkDef.h)
+ROOT_GENERATE_DICTIONARY(DL1DICT ${DL1HEADERFS} MODULE LASTDL1 LINKDEF ${LINKDIR}/LDL1LinkDef.h)
+
+
+INSTALL(TARGETS BASE DESTINATION ${CMAKE_LIB_DIR})
+INSTALL(FILES 
+        ${CMAKE_CURRENT_BINARY_DIR}/libBASE_rdict.pcm 
+        ${CMAKE_CURRENT_BINARY_DIR}/libLASTDL0_rdict.pcm
+        ${CMAKE_CURRENT_BINARY_DIR}/libLASTRAW_rdict.pcm
+        ${CMAKE_CURRENT_BINARY_DIR}/libLASTDL1_rdict.pcm
+        DESTINATION ${CMAKE_BIN_DIR})
+INSTALL(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/libLASTDL1_rdict.pcm
+        DESTINATION ${CMAKE_LIB_DIR})

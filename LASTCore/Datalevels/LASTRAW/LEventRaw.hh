@@ -15,14 +15,14 @@
 #include <unordered_map>
 #include "../LSimulationImage.hh"
 #include "../LDataBase.hh"
-#include "LEventElectronic.hh"
+#include "../LEventElectronic.hh"
 #include "../LJsonConfig.hh"
+#include "../LEvent.hh"
 /**
  * @brief Class to Read Raw Data from the EVENTIO File
  * 
  */
 
-class LEvent;
 class LCalibEvent;
 class LEventRaw : public LDataBase{
     public:
@@ -47,50 +47,9 @@ class LEventRaw : public LDataBase{
         void GetConfig(AllHessData*);                // get the telescope configuration from hsdata. fill the tel_config
         void GetRunConfig(AllHessData*);
         std::string input_fname;
-        void GetTrueImage( AllHessData* hsdata);
-        void GetEventWaveform( AllHessData* hsdata);
-        
+        void GetEventWaveform(AllHessData* hsdata);
+        void GetTrueImage(AllHessData* hsdata);
+        void GetEventShower(AllHessData* hsdata);
 
 };
-class LEvent
-{
-    public:
-    //friend class LREventRaw;
-        void GetTrueImage( AllHessData* hsdata);
-        void GetEventWaveform( AllHessData* hsdata);
-        const std::vector<int> GetImageTelList() {return simulation_image->GetTelList();};
-        const std::vector<int> GetWaveformTelList() {return event_electronic->GetTelList();};
-        LRTelTrueImage* GetTelImage(int tel_id){return simulation_image->GetTelImage(tel_id);};
-        LRTelElectronic* GetTelWaveform(int tel_id){return event_electronic->GetTelWaveform(tel_id);};
-        void AddTelImage(int tel_id, LRTelTrueImage* rtel_image){simulation_image->AddTelImage(tel_id, rtel_image);};
-        void AddTelImage(int tel_id, std::shared_ptr<LRTelTrueImage> t){simulation_image->AddTelImage(tel_id, t);};
-        void AddTelWaveform(int tel_id, LRTelElectronic* rtel_electronic){event_electronic->AddTelWaveform(tel_id, rtel_electronic);};
-        const std::vector<int> GetTelList() {return event_shower->GetTelList();};
-        LShower* GetShowerAddress(){return event_shower;};
-        LEvent(){
-            simulation_image = std::make_shared<LSimulationImage>();
-            event_electronic = std::make_shared<LEventElectronic>();
-            event_shower = new LRArray();
-            };
-        void GetShower(AllHessData* hsdata);                // get the shower data from hsdta.
-        ~LEvent(){ delete event_shower;}    
-        LRArray* event_shower;
-        void FilterTelescope(std::unordered_map<int, bool>);
-        template<typename iTel>
-        void FilterTel(std::shared_ptr<LTelescopes<iTel>>, std::unordered_map<int, bool>);
-        void Clear();
-    private:
-        std::shared_ptr<LSimulationImage> simulation_image;       // Will store true Images/true pes.
-        std::shared_ptr<LEventElectronic> event_electronic;           // Will store the waveform.
-
-
-};
-
-
-
-
-
-
-
-
 #endif

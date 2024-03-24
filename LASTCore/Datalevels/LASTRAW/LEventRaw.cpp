@@ -3,8 +3,9 @@
 #include <cstddef>
 #include <memory>
 #include "../LTelConfig.hh"
-#include "Datalevels/LDataBase.hh"
-#include "LEventElectronic.hh"
+#include "../LDataBase.hh"
+#include "../LEventElectronic.hh"
+#include "io_hess.h"
 
 LEventRaw::LEventRaw():LDataBase()
 {
@@ -30,6 +31,93 @@ void LEventRaw::GetShower(AllHessData* hsdata)
     shower->event_id = hsdata->mc_event.event;
 };
 
+void LEventRaw::GetEventShower(AllHessData* hsdata)
+{
+    event->event_shower->energy = hsdata->mc_shower.energy;
+    event->event_shower->altitude = hsdata->mc_shower.altitude;
+    event->event_shower->azimuth  = hsdata->mc_shower.azimuth;
+    event->event_shower->core_x   = hsdata->mc_event.xcore;
+    event->event_shower->core_y   = hsdata->mc_event.ycore;
+    event->event_shower->h_first_int = hsdata->mc_shower.h_first_int;
+    event->event_shower->x_max    = hsdata->mc_shower.xmax;
+    event->event_shower->shower_primary_id = hsdata->mc_shower.primary_id;
+    event->event_shower->obs_id   = hsdata->run_header.run;
+    event->event_shower->event_id = hsdata->mc_event.event;
+    event->event_shower->array_point_az = hsdata->run_header.direction[0];
+    event->event_shower->array_point_alt = hsdata->run_header.direction[1];
+}
+
+void LEventRaw::GetEventWaveform(AllHessData* hsdata)
+{
+    event->ClearWaveform();
+    for(auto i = 0; i < hsdata->event.central.num_teldata;i++)
+    {
+        int tel_id = hsdata->event.central.teldata_list[i];
+        auto tel_electronic = std::make_shared<LRTelElectronic>();
+        tel_electronic->tel_id = tel_id;
+        tel_electronic->event_id = hsdata->mc_event.event;
+        tel_electronic->num_gains = hsdata->event.teldata[tel_id - 1].raw->num_gains;
+        tel_electronic->num_pixels = hsdata->event.teldata[tel_id - 1].raw->num_pixels;
+        tel_electronic->num_samples = hsdata->event.teldata[tel_id - 1].raw->num_samples;
+        tel_electronic->tel_alt = hsdata->event.trackdata[tel_id - 1].altitude_raw;
+        tel_electronic->tel_az = hsdata->event.trackdata[tel_id - 1].azimuth_raw;
+        tel_electronic->Allocate();
+        for( auto igain = 0; igain < tel_electronic->num_gains; igain++)
+        {
+            for( auto ichannel = 0; ichannel < tel_electronic->num_pixels; ichannel++)
+            {
+                for( auto isample = 0; isample < tel_electronic->num_samples; isample++)
+                {
+                    auto index = igain * tel_electronic->num_pixels * tel_electronic->num_samples + ichannel * tel_electronic->num_samples + isample;
+                    tel_electronic->adc_sample[index] = hsdata->event.teldata[tel_id - 1].raw->adc_sample[igain][ichannel][isample];
+                }
+                if(hsdata->event.teldata[tel_id - 1].raw->known)
+                {
+                    tel_electronic->adc_known[igain * tel_electronic->num_pixels + ichannel] = hsdata->event.teldata[tel_id - 1].raw->adc_known[igain][ichannel];
+                    tel_electronic->adc_sum[igain * tel_electronic->num_pixels + ichannel] = hsdata->event.teldata[tel_id - 1].raw->adc_sum[igain][ichannel];
+                }
+            }
+        }    
+        event->AddTelWaveform(tel_id, *tel_electronic);
+    }
+}
+void LEventRaw::GetTrueImage(AllHessData* hsdata)
+{
+    event->ClearImage();
+    event->ClearShower();
+    for(auto i = 0; i < hsdata->event.central.num_teltrg; i++)
+    {
+        int tel_id = hsdata->event.central.teltrg_list[i];
+        auto tel_true_image = std::make_shared<LRTelTrueImage>();
+        tel_true_image->event_id = hsdata->mc_event.event;
+        tel_true_image->tel_id = tel_id;
+        tel_true_image->num_pixels = hsdata->mc_event.mc_pe_list[tel_id - 1].pixels;
+        tel_true_image->Allocate();
+        if(hsdata->event.trackdata[tel_id - 1].raw_known )
+        {
+            tel_true_image->tel_alt = hsdata->event.trackdata[tel_id - 1].altitude_raw;
+            tel_true_image->tel_az = hsdata->event.trackdata[tel_id - 1].azimuth_raw;
+        }
+        else 
+        {
+            tel_true_image->tel_alt = hsdata->run_header.direction[1];
+            tel_true_image->tel_az = hsdata->run_header.direction[0];
+        }
+        for(auto ipix = 0; ipix < tel_true_image->num_pixels; ipix++)
+        {
+            tel_true_image->true_pe[ipix] = hsdata->mc_event.mc_pe_list[tel_id - 1].pe_count[ipix];
+        }
+        tel_true_image->Allocate_Pe(hsdata->mc_event.mc_pe_list[tel_id - 1].npe);
+        if(hsdata->mc_event.mc_pe_list[tel_id -1].atimes)   
+            for(int ipe = 0; ipe < hsdata->mc_event.mc_pe_list[tel_id - 1].npe; ipe++)
+            {
+                tel_true_image->pe_time[ipe] = hsdata->mc_event.mc_pe_list[tel_id - 1].atimes[ipe];
+            }
+        tel_true_image->Compute_Spread(); 
+        event->AddTelImage(tel_id, *tel_true_image);
+        event->event_shower->AddTel(tel_id);
+    }
+}
 void LEventRaw::GetConfig(AllHessData* hsdata)
 {
     // Fill all RunConfig parameters
@@ -86,6 +174,7 @@ void LEventRaw::GetRunConfig(AllHessData* hsdata)
     run_config->min_viewcone_radius = hsdata->mc_run_header.viewcone[0]; 
     run_config->atmposphere = hsdata->mc_run_header.atmosphere;
     run_config->corsika_iact_options = hsdata->mc_run_header.corsika_iact_options;
+    run_config->corsika_bunchsize = (int)hsdata->mc_run_header.corsika_bunchsize;
     run_config->corsika_low_E_model = hsdata->mc_run_header.corsika_low_E_model;
     run_config->corsika_high_E_model = hsdata->mc_run_header.corsika_high_E_model;
     run_config->corsika_wlen_min = hsdata->mc_run_header.corsika_wlen_min;
@@ -221,133 +310,19 @@ bool LEventRaw::ProcessEvent()
 }
 void LEventRaw::GetEvent()
 {
-    event->GetShower(simtel_file->GetHsdata());
-    event->GetTrueImage(simtel_file->GetHsdata());
-    event->GetEventWaveform(simtel_file->GetHsdata());
+    GetShower(simtel_file->GetHsdata());
+    GetEventShower(simtel_file->GetHsdata());
+    GetTrueImage(simtel_file->GetHsdata());
+    GetEventWaveform(simtel_file->GetHsdata());
 }
 void LEventRaw::Close()
 {
     event->Clear();
     LDataBase::Close();
 }
-void LEvent::GetTrueImage( AllHessData *hsdata)
-{
-    simulation_image->telescopes_true_image = std::make_shared<LTelescopes<std::shared_ptr<LRTelTrueImage> >>();
-    //simulation_image->telescopes_true_image = new LTelescopes<std::shared_ptr<LRTelTrueImage> >();
-    //LOG(INFO) <<"Test is "<< simulation_image->telescopes_true_image->telescopes_dict[1]->tel_id;
-    // For True Image, we considering using the num_teltrg
-    for(auto i = 0; i < hsdata->event.central.num_teltrg; i++)
-    {
-        int tel_id = hsdata->event.central.teltrg_list[i];
-        auto tel_true_image = std::make_shared<LRTelTrueImage>();
-        tel_true_image->event_id = hsdata->mc_event.event;
-        tel_true_image->tel_id = tel_id;
-        tel_true_image->num_pixels = hsdata->mc_event.mc_pe_list[tel_id - 1].pixels;
-        tel_true_image->Allocate();
-        if(hsdata->event.trackdata[tel_id - 1].raw_known )
-        {
-            tel_true_image->tel_alt = hsdata->event.trackdata[tel_id - 1].altitude_raw;
-            tel_true_image->tel_az = hsdata->event.trackdata[tel_id - 1].azimuth_raw;
-        }
-        else 
-        {
-            tel_true_image->tel_alt = hsdata->run_header.direction[1];
-            tel_true_image->tel_az = hsdata->run_header.direction[0];
-        }
-        for(auto ipix = 0; ipix < tel_true_image->num_pixels; ipix++)
-        {
-            tel_true_image->true_pe[ipix] = hsdata->mc_event.mc_pe_list[tel_id - 1].pe_count[ipix];
-        }
-        tel_true_image->Allocate_Pe(hsdata->mc_event.mc_pe_list[tel_id - 1].npe);
-        for(int ipe = 0; ipe < hsdata->mc_event.mc_pe_list[tel_id - 1].npe; ipe++)
-        {
-            tel_true_image->pe_time[ipe] = hsdata->mc_event.mc_pe_list[tel_id - 1].atimes[ipe];
-            tel_true_image->pe_intensity[ipe] = hsdata->mc_event.mc_pe_list[tel_id - 1].amplitudes[ipe];
-        }
-        tel_true_image->Compute_Spread();
-        simulation_image->telescopes_true_image->AddTel(tel_id, tel_true_image);
-        event_shower->AddTel(tel_id);
-    }
-    
-}
 bool LEventRaw::ReadEvent()
 {
     bool flag = ProcessEvent();
     GetEvent();
     return flag;
-}
-
-void LEvent::GetEventWaveform(AllHessData *hsdata)
-{
-    event_electronic->telescopes_electronic->Clear(); 
-    //event_electronic->telescopes_electronic = new LTelescopes<std::shared_ptr<LRTelElectronic> >();
-    for(auto i = 0; i < hsdata->event.central.num_teldata;i++)
-    {
-        int tel_id = hsdata->event.central.teldata_list[i];
-        auto tel_electronic = std::make_shared<LRTelElectronic>();
-        tel_electronic->tel_id = tel_id;
-        tel_electronic->event_id = hsdata->mc_event.event;
-        tel_electronic->num_gains = hsdata->event.teldata[tel_id - 1].raw->num_gains;
-        tel_electronic->num_pixels = hsdata->event.teldata[tel_id - 1].raw->num_pixels;
-        tel_electronic->num_samples = hsdata->event.teldata[tel_id - 1].raw->num_samples;
-        tel_electronic->tel_alt = hsdata->event.trackdata[tel_id - 1].altitude_raw;
-        tel_electronic->tel_az = hsdata->event.trackdata[tel_id - 1].azimuth_raw;
-        tel_electronic->Allocate();
-        for( auto igain = 0; igain < tel_electronic->num_gains; igain++)
-        {
-            for( auto ichannel = 0; ichannel < tel_electronic->num_pixels; ichannel++)
-            {
-                for( auto isample = 0; isample < tel_electronic->num_samples; isample++)
-                {
-                    auto index = igain * tel_electronic->num_pixels * tel_electronic->num_samples + ichannel * tel_electronic->num_samples + isample;
-                    tel_electronic->adc_sample[index] = hsdata->event.teldata[tel_id - 1].raw->adc_sample[igain][ichannel][isample];
-                }
-                tel_electronic->adc_sum[igain * tel_electronic->num_pixels + ichannel] = hsdata->event.teldata[tel_id - 1].raw->adc_sum[igain][ichannel];
-                tel_electronic->adc_known[igain * tel_electronic->num_pixels + ichannel] = hsdata->event.teldata[tel_id - 1].raw->adc_known[igain][ichannel]; 
-            }
-        }
-        event_electronic->telescopes_electronic->AddTel(tel_id, tel_electronic);
-    }
-}
-
-void LEvent::GetShower(AllHessData *hsdata)
-{
-    event_shower->Clear();
-    event_shower->energy = hsdata->mc_shower.energy;
-    event_shower->altitude = hsdata->mc_shower.altitude;
-    event_shower->azimuth  = hsdata->mc_shower.azimuth;
-    event_shower->core_x   = hsdata->mc_event.xcore;
-    event_shower->core_y   = hsdata->mc_event.ycore;
-    event_shower->h_first_int = hsdata->mc_shower.h_first_int;
-    event_shower->x_max    = hsdata->mc_shower.xmax;
-    event_shower->shower_primary_id = hsdata->mc_shower.primary_id;
-    event_shower->obs_id   = hsdata->run_header.run;
-    event_shower->event_id = hsdata->mc_event.event;
-    event_shower->array_point_az = hsdata->run_header.direction[0];
-    event_shower->array_point_alt = hsdata->run_header.direction[1];
-}
-void LEvent::FilterTelescope(std::unordered_map<int, bool> tel_flags)
-{
-    FilterTel(simulation_image->GetData(), tel_flags);
-    FilterTel(event_electronic->GetData(), tel_flags);
-
-}
-template<typename iTel>
-void LEvent::FilterTel(std::shared_ptr<LTelescopes<iTel>> tels, std::unordered_map<int, bool> tel_flags)
-{
-    auto tel_id_list = tels->GetKeys();
-    for( auto i = -1; i< tel_id_list.size(); i++)
-    {
-        auto tel_id = tel_id_list[i];
-        if(!tel_flags[tel_id])
-        {
-            tels->DeleteTel(tel_id, i);
-        }
-    }
-
-}
-void LEvent::Clear()
-{
-    event_electronic->Clear();
-    simulation_image->Clear();
 }
