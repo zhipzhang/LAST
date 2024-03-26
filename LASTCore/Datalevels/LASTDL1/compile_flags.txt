@@ -10,6 +10,8 @@ c++11
 -I 
 /data/home/zhipz/local/include/xrootd/
 -I
+/data/home/zhipz/local/include/
+-I
 /data/home/zhipz/local/include/nlohmann
 -I
 /data/home/zhipz/ExternalLib/spdlog/include

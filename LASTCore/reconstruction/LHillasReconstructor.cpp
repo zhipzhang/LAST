@@ -85,7 +85,6 @@ void LHillasReconstructor::Direction_Reconstruction(LDL1bEvent& ldl1bevent)
     std::vector<double> sy_weight;
     std::vector<double> weight;
     double tmp_x, tmp_y, tmp_ang;
-    spdlog::info("Reconstructing the direction of the shower, ntel is {}", reconstruct_tel.size());
     for(int i = 0; i < reconstruct_tel.size(); i++)
     {
         for(int j = i; j < reconstruct_tel.size(); j++)
@@ -95,7 +94,6 @@ void LHillasReconstructor::Direction_Reconstruction(LDL1bEvent& ldl1bevent)
             if(intersect_lines(hillas_dict[itel].GetCogx(), hillas_dict[itel].GetCogy(), hillas_dict[itel].GetPsi(), 
                 hillas_dict[jtel].GetCogx(), hillas_dict[jtel].GetCogy(), hillas_dict[jtel].GetPsi(), &tmp_x, &tmp_y, &tmp_ang) == 1)
             {
-                spdlog::info("Reconstructing the direction of the shower: x: {}, y: {}, ang: {}, itel{}, jtel{}", tmp_x, tmp_y, tmp_ang, itel, jtel);
                 sx_weight.push_back(tmp_x);
                 sy_weight.push_back(tmp_y);
                 double scale_size = (hillas_dict[itel].GetSize() * hillas_dict[jtel].GetSize())/(hillas_dict[itel].GetSize() + hillas_dict[jtel].GetSize());

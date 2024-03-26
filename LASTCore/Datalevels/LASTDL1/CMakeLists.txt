@@ -5,3 +5,6 @@ add_library(LASTDL1 SHARED ${DL1SRC})
 target_link_libraries(LASTDL1 PUBLIC BASE)
 #target_link_libraries(LASTDL1 PUBLIC  spdlog::spdlog_header_only gflags::gflags nlohmann_json::nlohmann_json  ${ROOT_LIBRARIES} BASE)
 target_include_directories(LASTDL1 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}  ${ROOT_INCLUDE_DIRS} ${ExternalInc} )
+
+
+INSTALL(TARGETS LASTDL1 DESTINATION ${CMAKE_LIB_DIR})

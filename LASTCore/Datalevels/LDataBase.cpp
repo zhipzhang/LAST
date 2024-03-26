@@ -54,7 +54,7 @@ void LDataBase::Read(TFile* f)
         shower_tree = simulation_shower_dir->Get<TTree>("shower");
         if(shower_tree)
         {
-            shower_tree->SetBranchAddress("shower", &ishower);
+            shower_tree->SetBranchAddress("shower_info", &ishower);
         }
     }
 

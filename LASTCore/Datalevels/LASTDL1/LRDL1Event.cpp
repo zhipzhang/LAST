@@ -1,6 +1,7 @@
 #include "LRDL1Event.hh"
 #include "../LShower.hh"
 #include "spdlog/spdlog.h"
+#include <set>
 
 LRDL1Event::LRDL1Event(const LJsonConfig& cfg, const char mode): cmd_config(cfg), LDL1Event()
 {
@@ -20,6 +21,10 @@ void LRDL1Event::InitRootFile()
     if(outname.empty())
     {
         outname =  cmd_config.GetOutputFileName();
+    }
+    if(outname.compare(0, 4, "/eos") == 0)
+    {
+        outname = cmd_config.GetUrl() + outname;
     }
     root_file.reset(TFile::Open(outname.c_str(), "RECREATE"));
     dl1_dir = root_file->mkdir(dl1_dirname);
@@ -61,13 +66,12 @@ bool LRDL1Event::ReadEvent()
             spdlog::info("{} events have been read {}", nevents, ievents);
             return false;
         }
-        spdlog::info("Reading event {}", ievents);
+        //spdlog::info("Reading event {}", ievents);
         arrayevent->GetEntry(ievents++);
         ldl1event->Clear();
         for( const auto itel: ldl1array->trigger_tels)
         {
             auto flag = dl1event_tree->GetEntryWithIndex(ldl1array->event_id, itel);
-                spdlog::info("Can't find the event {} in telescope {}", ldl1array->event_id, itel);
 
             if( flag == -1)
             {
@@ -85,6 +89,7 @@ void LRDL1Event::HandleEvent()
         dl1_tel_event = (*ldl1event)[itel].get();
         dl1event_tree->Fill();
     }
+
     arrayevent->Fill();
 }
 
