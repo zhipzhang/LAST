@@ -18,8 +18,8 @@
  {
         public:
             void InitRootFile();
-            LRDL1Event(const LJsonConfig&, const char mode = 'w'); // Constructor for produce dl1 file 
-            LRDL1Event(const LJsonConfig&);                      // Constructor for read dl1 file
+            LRDL1Event(const LJsonConfig&, const char mode ); // Constructor for produce dl1 file 
+            LRDL1Event(const LJsonConfig&);                      // Constructor for read a lot of dl1 file.
             
             void HandleEvent();
             void StoreTTree();
@@ -29,6 +29,12 @@
 
             virtual ~LRDL1Event(){};
             const LJsonConfig& cmd_config;
+            void Close()
+            {
+                ievents = 0;
+                root_file->Close();
+                LDL1Event::Close();
+            }
 
         private:
             int nevents;

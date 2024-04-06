@@ -13,8 +13,10 @@ LDL1Event::LDL1Event(): LDataBase()
 
 LDL1Event::~LDL1Event()
 {
+    /*
     delete dl1_tel_event;
     delete ldl1array;
+    */
 };
 void LDL1Event::SetTelHillas(int event_id, int tel_id, LHillasParameters hillas)
 {
@@ -27,4 +29,9 @@ void LDL1Event::AddTelEvent(int tel_id, LRDL1TelEvent* dl1televent)
     auto itel_event = std::make_shared<LRDL1TelEvent>();
     *itel_event = *dl1televent;
     ldl1event->AddTel(tel_id, itel_event);
+}
+void LDL1Event::Close()
+{
+    Clear();
+    LDataBase::Close();
 }

@@ -15,7 +15,11 @@ add_executable(last-hillasreco LASTDL1bGen.cpp)
 target_link_libraries(last-hillasreco PRIVATE LASTREC)
 target_include_directories(last-hillasreco PRIVATE ${COREDIR})
 
-set(MY_EXECUTABLE_TARGETS last-convert last-dl0gen last-dl1gen last-hillasreco)
+add_executable(last-dl1ana LASTDL1Ana.cpp)
+target_link_libraries(last-dl1ana PRIVATE LASTREC)
+target_include_directories(last-dl1ana PRIVATE ${COREDIR})
+
+set(MY_EXECUTABLE_TARGETS last-convert last-dl0gen last-dl1gen last-hillasreco last-dl1ana)
 INSTALL(TARGETS ${MY_EXECUTABLE_TARGETS}
     RUNTIME DESTINATION ${CMAKE_BIN_DIR})
 

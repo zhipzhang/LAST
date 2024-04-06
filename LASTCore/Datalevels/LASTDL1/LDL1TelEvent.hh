@@ -152,6 +152,14 @@ class LRDL1TelEvent : public TObject
     {
         return leakage2;
     }
+    double GetConcentrationCog() const
+    {
+        return concentration_cog;
+    }
+    double GetConcentrationCore() const
+    {
+        return concentration_core;
+    }
     void SetTelPointing(double tel_alt, double tel_az)
     {
         this->tel_alt = tel_alt;

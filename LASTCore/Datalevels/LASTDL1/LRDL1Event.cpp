@@ -16,6 +16,12 @@ LRDL1Event::LRDL1Event(const LJsonConfig& cfg, const char mode): cmd_config(cfg)
         InitRootFile();
     }
 }
+LRDL1Event::LRDL1Event(const LJsonConfig& cfg): cmd_config(cfg), LDL1Event()
+{
+    dl1_tel_event = new LRDL1TelEvent();
+    ldl1array = new LRArray();
+    spdlog::info("LRDL1Event: Initialize for multiple files");
+}
 void LRDL1Event::InitRootFile()
 {
     if(outname.empty())

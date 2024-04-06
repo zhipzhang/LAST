@@ -13,7 +13,7 @@ class LDL1Event : public LDataBase
 {
     public:
         LDL1Event();
-        ~LDL1Event();
+        virtual ~LDL1Event();
         void SetTelHillas(int event_id, int tel_id, LHillasParameters hillas);
         void AddTelEvent(int tel_id, std::shared_ptr<LRDL1TelEvent> dl1televent) { ldl1array->AddTel(tel_id);ldl1event->AddTel(tel_id, dl1televent);};
         void AddTelEvent(int tel_id, LRDL1TelEvent*);
@@ -25,6 +25,27 @@ class LDL1Event : public LDataBase
         double GetPointingAlt() const {return ldl1array->array_point_alt;};
         const LRArray& GetEventArrayInfo() const {return *ldl1array;};
         LShower& GetEventArrayInfo() {return *ldl1array;};
+        void Close();
+        double GetMCxcore() const
+        {
+            return ldl1array->core_x;
+        }
+        double GetMCycore() const
+        {
+            return ldl1array->core_y;
+        }
+        double GetMCalt() const
+        {
+            return ldl1array->altitude;
+        }
+        double GetMCaz() const
+        {
+            return ldl1array->azimuth;
+        }
+        double GetMCenergy() const
+        {
+            return ldl1array->energy;
+        }
     protected:
         std::shared_ptr<LTelescopes<std::shared_ptr<LRDL1TelEvent>>> ldl1event;
         LRDL1TelEvent* dl1_tel_event;

@@ -4,6 +4,7 @@
 #include "XrdCl/XrdClFileSystem.hh"
 #include "XrdCl/XrdClXRootDResponses.hh"
 #include "spdlog/spdlog.h"
+#include "XroodCompressd_File.hh"
 #include "initial.h"
 #include <byteswap.h>
 #include <cstddef>
@@ -40,7 +41,7 @@ LAST_IO::EventIO_Object::EventIO_Object(std::string filename, unsigned long leng
   if(endsWith(filename, ".zst"))
   {
     spdlog::info("file is compressed with zstd");
-    //input_file = new CXrdFile_Zst(filename);
+    input_file = new CXrdFile_Zst(filename);
   }
   else {
     input_file  = new XrdFile(filename);
