@@ -39,6 +39,7 @@
         private:
             int nevents;
             int ievents = 0;
+            int telescope_flag = 0;
             LRDL1TelEvent* dl1_tel_event;
             bool copyshower = false;
             bool copyrunconfig = true;

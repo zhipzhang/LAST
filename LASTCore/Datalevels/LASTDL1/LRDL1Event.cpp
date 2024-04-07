@@ -77,9 +77,9 @@ bool LRDL1Event::ReadEvent()
         ldl1event->Clear();
         for( const auto itel: ldl1array->trigger_tels)
         {
-            auto flag = dl1event_tree->GetEntryWithIndex(ldl1array->event_id, itel);
+            dl1event_tree->GetEntry(telescope_flag++);
 
-            if( flag == -1)
+            if(dl1_tel_event->GetEventID() != ldl1array->event_id || dl1_tel_event->GetTelID() != itel)
             {
                 spdlog::error("Can't find the event {} in telescope {}", ldl1array->event_id, itel);
                 return false;
@@ -102,7 +102,7 @@ void LRDL1Event::HandleEvent()
 void LRDL1Event::StoreTTree()
 {
     dl1_dir->cd();
-    dl1event_tree->BuildIndex("event_id", "tel_id");
+   // dl1event_tree->BuildIndex("event_id", "tel_id");
     dl1event_tree->Write();
     arrayevent->Write();
     root_file->Write();

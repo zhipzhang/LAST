@@ -60,7 +60,7 @@ void LRDL0Event::CopyEvent()
 void LRDL0Event::StoreTTree()
 {
     dl0_dir->cd();
-    dl0event_tree->BuildIndex("event_id", "tel_id");
+    //dl0event_tree->BuildIndex("event_id", "tel_id");
     dl0event_tree->Write();
     arrayevent->Write();
     root_file->Write();
@@ -100,8 +100,8 @@ bool LRDL0Event::ReadEvent()
     dl0event->Clear();
     for( const auto itel : dl0array->trigger_tels)
     {
-        auto flag = dl0event_tree->GetEntryWithIndex(event_id, itel);
-        if( flag == -1)
+        dl0event_tree->GetEntry(telescope_flag++);
+        if(dl0_tel_event->GetEventId() != event_id || dl0_tel_event->GetTelId() != itel)
         {
             spdlog::error("Can't find the event {} in telescope {}", event_id, itel);
             return false;

@@ -37,6 +37,7 @@
             int nevents;
             const LJsonConfig& cmd_config;
             int ievents = 0;
+            int telescope_flag = 0;
             LRDL0TelEvent* dl0_tel_event = nullptr;
             bool copyshower = false;
             bool copyrunconfig = true;

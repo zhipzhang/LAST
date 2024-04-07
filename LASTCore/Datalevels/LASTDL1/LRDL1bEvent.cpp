@@ -52,7 +52,7 @@ void LRDL1bEvent::HandleEvent()
 void LRDL1bEvent::StoreTTree()
 {
     dir->cd();
-    dl1teltree->BuildIndex("event_id", "tel_id");
+    //dl1teltree->BuildIndex("event_id", "tel_id");
     dl1arraytree->Write();
     dl1teltree->Write();
     root_file->Close();

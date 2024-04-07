@@ -39,7 +39,7 @@ class CXrdFile_Zst : public XrdFile {
     LASTByteNum rc;
     if((rc = XrdFile::read(bufferInSize, (BYTE*)buffIn)) != bufferInSize)
     {
-      spdlog::error("Error in Reading, Maybe End of File");
+      spdlog::warn("Maybe End of File , the read bytes is {} ", rc);
     }
     input = {buffIn, rc, 0};
   }

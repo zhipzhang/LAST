@@ -50,6 +50,10 @@ class LRDL0TelEvent :public TObject
         {
             return event_id;
         }
+        int GetTelId() const
+        {
+            return tel_id;
+        }
         Double32_t GetTelAlt() const
         {
             return tel_alt;
