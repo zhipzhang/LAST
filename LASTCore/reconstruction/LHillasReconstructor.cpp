@@ -76,6 +76,7 @@ bool LHillasReconstructor::ProcessEvent(const LDL1Event& dl1event, LDL1bEvent& d
         dl1_tel_event->SetShowerInfo(dl1event.GetEventArrayInfo(), dl1event.GetEventArrayInfo().GetTrigNums(), reconstruct_tel.size());
         dl1bevent.AddTelEvent(itel, dl1_tel_event);
     }
+    dl1bevent.SetDirectionError();
     return true;
     
 }

@@ -48,6 +48,10 @@ class LHillasParameters
             return *this;
         }
         LHillasParameters transform_frame(std::pair<double, double> tel_pointing_direction, std::pair<double, double> array_pointing_direction) const;
+        void SetMiss(double miss)
+        {
+            this->miss = miss;
+        }
         static void angles_to_offset(double obj_az, double obj_alt, double az, double alt, double focal_length, double& offset_x, double& offset_y);
         static void offset_to_angles(double offset_x, double offset_y,double az, double alt, double focal_length, double& obj_az, double& obj_alt);
     private:

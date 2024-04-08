@@ -7,6 +7,9 @@
 #include "LHillasParameters.hh"
 #include "RtypesCore.h"
 #include "TObject.h"
+#include "TMath.h"
+#include <root/TMath.h>
+
 class LRDL1TelEvent : public TObject
 {
     protected:
@@ -165,6 +168,28 @@ class LRDL1TelEvent : public TObject
         this->tel_alt = tel_alt;
         this->tel_az = tel_az;
     }
+    void ComputeMiss(double obj_az, double obj_alt)
+    {
+        double offset_x, offset_y;
+        hillas.angles_to_offset(obj_az, obj_alt, tel_az, tel_alt, 1, offset_x, offset_y);
+        double miss = line_point_distance(offset_x, offset_y, 0, TMath::Cos(hillas.GetPsi()), TMath::Sin(hillas.GetPsi()), 0, hillas.GetCogx(), hillas.GetCogy(), 0);
+        hillas.SetMiss(miss);
+    }
+        double line_point_distance (double xp1, double yp1, double zp1, 
+                    double cx, double cy, double cz,
+                double x, double y, double z)
+        {
+            double a, a1, a2, a3, b;
+    
+            a1 = (y-yp1)*cz - (z-zp1)*cy;
+            a2 = (z-zp1)*cx - (x-xp1)*cz;
+            a3 = (x-xp1)*cy - (y-yp1)*cx;
+            a  = a1*a1 + a2*a2 + a3*a3;
+            b = cx*cx + cy*cy + cz*cz;
+            if ( a<0. || b<= 0. )
+                return -1;
+            return TMath::Sqrt(a/b);
+        }
     ClassDef(LRDL1TelEvent, 2)
 
 };

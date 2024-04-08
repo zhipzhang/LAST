@@ -14,6 +14,7 @@
 
  #include "../LShower.hh"
 #include "RtypesCore.h"
+#include <root/RtypesCore.h>
 class LDL1bArrayEvent: public LRArray
 {
     public:
@@ -33,6 +34,7 @@ class LDL1bArrayEvent: public LRArray
     Double32_t avearge_intensity;
     Double32_t hillas_hmax;
     Double32_t hillas_hmax_uncertainty;
+    Double32_t hillas_direction_error;
     void Reset()
     {
         Isvalid = false;

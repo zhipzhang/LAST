@@ -29,12 +29,12 @@ LRDL1bEvent::LRDL1bEvent(const LJsonConfig& config, const char mode): cmd_config
 
 void LRDL1bEvent::InitROOTFile()
 {
-    std::string fname  = cmd_config.GetInputFileName();
-    if(cmd_config.GetOutputFileName().compare(0, 4, "/eos"))
+    std::string fname  = cmd_config.GetOutputFileName();
+    if(cmd_config.GetOutputFileName().compare(0, 4, "/eos") == 0)
     {
         fname = cmd_config.GetUrl() + cmd_config.GetOutputFileName();
     }
-    root_file.reset(TFile::Open((fname.c_str(), "RECREATE")));
+    root_file.reset(TFile::Open(fname.c_str(), "RECREATE"));
     dir = root_file->mkdir(dirname);
     dir->cd();
     dl1arraytree = new TTree("dl1arraytree", "dl1arraytree");
