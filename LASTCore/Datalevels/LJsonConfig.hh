@@ -99,6 +99,7 @@ class LJsonConfig
         return tokens;
     }
     public:
+        bool filter_tel = false;
         std::vector<std::string> input_fnames;
         std::vector<int> only_telescopes;
         LJsonConfig(int argc, char** argv)

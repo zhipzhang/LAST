@@ -16,7 +16,10 @@ void LJsonConfig::ParseCommandLineFlags(int argc, char **argv)
     if(input_fname.find(',') != std::string::npos)
         input_fnames = splitString(FLAGS_input_file, ',');
     if(FLAGS_only_telescope != "")
+    {
+        filter_tel = true;
         only_telescopes = splitStringToInt(FLAGS_only_telescope, ',');
+    }
 }
 
 void LJsonConfig::ReadConfiguration()

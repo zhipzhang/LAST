@@ -4,6 +4,7 @@
 #define _LDL1Event_HH
 #include "../LDataBase.hh"
 #include <memory>
+#include <unordered_map>
 #include "../LTelescopesTemplate.hh"
 #include "../LShower.hh"
 #include "LHillasParameters.hh"
@@ -46,6 +47,8 @@ class LDL1Event : public LDataBase
         {
             return ldl1array->energy;
         }
+        void FilterTelescope(const std::vector<int> tels) ;
+        bool IsEmpty() const { if(ldl1event->GetTelNum() == 0) return true; return false;}
     protected:
         std::shared_ptr<LTelescopes<std::shared_ptr<LRDL1TelEvent>>> ldl1event;
         LRDL1TelEvent* dl1_tel_event;

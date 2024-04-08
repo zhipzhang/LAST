@@ -16,6 +16,15 @@ int main(int argc, char** argv)
     last_hillas_reconstructor->Init(*lasdtdl1);
     while(lasdtdl1->ReadEvent())
     {
+        if(config.filter_tel)
+        {
+            spdlog::info("Filtering telescopes");
+            lasdtdl1->FilterTelescope(config.only_telescopes);
+            if(lasdtdl1->IsEmpty())
+            {
+                continue;
+            }
+        }
         last_hillas_reconstructor->ProcessEvent(*lasdtdl1, *lastdl1b);
         lastdl1b->HandleEvent();
     }

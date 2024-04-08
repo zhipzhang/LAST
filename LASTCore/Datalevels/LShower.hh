@@ -52,6 +52,7 @@ class LRArray: public LShower, public TObject
         int GetTrigNums() const {return trigger_tels.size();}
         std::vector<int> GetTelList() {return trigger_tels;}
         int GetEventID() {return event_id;}
+        void DeleteTel(int i) {trigger_tels.erase(trigger_tels.begin() + i);}
     ClassDef(LRArray, 2);
 };
 
