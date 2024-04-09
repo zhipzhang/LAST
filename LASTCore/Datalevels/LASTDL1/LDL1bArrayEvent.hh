@@ -39,12 +39,16 @@ class LDL1bArrayEvent: public LRArray
     {
         Isvalid = false;
         reconstruction_tels.clear();
+        hillas_alt = hillas_az = hillas_alt_uncertainty = hillas_az_uncertainty = 0;
+        hillas_tilted_uncertainty_x = hillas_tilted_uncertainty_y =  hillas_tiled_x = hillas_tiled_y =0;
+        hillas_core_x = hillas_core_y = 0;
+        avearge_intensity = hillas_hmax_uncertainty = hillas_hmax = hillas_direction_error = 0;
     }
     void SetRecTels(std::vector<int> rec_tels)
     {
         reconstruction_tels = rec_tels;
     }
-    ClassDef(LDL1bArrayEvent, 1)
+    ClassDef(LDL1bArrayEvent, 2)
 };
 
 
