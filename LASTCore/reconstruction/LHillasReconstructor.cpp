@@ -54,7 +54,7 @@ bool LHillasReconstructor::ProcessEvent(const LDL1Event& dl1event, LDL1bEvent& d
     SetPointing(dl1event);
     SetTiltedPos();
     dl1bevent.GetEventArrayInfo() = dl1event.GetEventArrayInfo();
-    if(reconstruct_tel.size() < 2)
+    if(reconstruct_tel.size() < cmd_config.GetMinTelNum())
     {
         return false;
     }

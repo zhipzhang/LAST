@@ -16,16 +16,18 @@
 		"image_cleaner_type": "TailCutsClean",
 		"LTailCutsCleaner" :{
 			"picture_threshold_pe": 5,
-			"boundary_threshold_pe": 2,
+			"boundary_threshold_pe": 7,
 			"min_picture_neighbors": 2
 		}
 	},
 	"LImageQuality":{
 		"num_pixels" : 3,
-		"min_size"   : 50
+		"min_size"   : 100,
+		"max_leakage2": 0.3
 	},
-	"ShowerProcesser":{
-		"reconstructor_types": ["LHillasReconstructor"]
+	"ShowerProcessor":{
+		"reconstructor_types": ["LHillasReconstructor"],
+		"min_multiplicity" : 4
 	},
 	"MAX_IO_LENGTH": 100000000000,
 	"Camera_Name" : "LASTCamera"

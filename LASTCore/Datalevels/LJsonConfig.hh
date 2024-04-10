@@ -70,6 +70,7 @@ class LJsonConfig
     std::string output_fname;
     DataWriterinfo* writer_info;
     LQualityCheck* quality_check;
+    int min_multiplicity = 2;
     const std::vector<std::string> clean_methods{"TailCutsCleaner", "MARSCleaner"};
     bool StoreWaveform = false;
     static std::vector<int> splitStringToInt(const std::string& input, char delimiter) {
@@ -98,16 +99,18 @@ class LJsonConfig
         }
         return tokens;
     }
+        void SetCommandLine();
     public:
         bool filter_tel = false;
         std::vector<std::string> input_fnames;
         std::vector<int> only_telescopes;
         LJsonConfig(int argc, char** argv)
         {
-            ParseCommandLineFlags(argc, argv);
-            ReadConfiguration();
             quality_check = new LQualityCheck();
             writer_info = new DataWriterinfo();
+            ParseCommandLineFlags(argc, argv);
+            ReadConfiguration();
+            SetCommandLine();
         }
         ~LJsonConfig(){ delete quality_check; delete writer_info;};
         void ParseCommandLineFlags(int argc, char** argv);
@@ -139,6 +142,10 @@ class LJsonConfig
         bool WriteWaveform() const
         {
             return StoreWaveform;
+        }
+        int GetMinTelNum() const
+        {
+            return min_multiplicity;
         }
 
 };
