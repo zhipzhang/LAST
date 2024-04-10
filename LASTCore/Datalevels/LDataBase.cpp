@@ -9,6 +9,7 @@
 #include "TROOT.h"
 #include "TTree.h"
 #include "spdlog/spdlog.h"
+#include <root/TMath.h>
 
 
 
@@ -226,25 +227,6 @@ LDataBase::LDataBase()
     tel_config = std::make_shared<LTelescopes<std::shared_ptr<LRTelescopeConfig> >>();
     ishower = new LRShower();
     itel_config = new LRTelescopeConfig();
-}
-void LDataBase::Init2Poly(TH2Poly* th2poly, int itel)
-{
-    if(th2poly->IsZombie())
-    {
-        spdlog::error("TH2Poly is zombie");
-        return;
-    }
-    auto tmpconfig = (*tel_config)[itel];
-    for(int ipix = 0;ipix < tmpconfig->num_pixels; ipix++)
-    {
-        double pix_size = tmpconfig->pix_size /tmpconfig->focal_length;
-        double x = tmpconfig->pix_x[ipix] / tmpconfig->focal_length;
-        double y = tmpconfig->pix_y[ipix] / tmpconfig->focal_length;
-        double bin_x[4] = {x - pix_size/2, x + pix_size/2, x + pix_size/2, x - pix_size/2};
-        double bin_y[4] = {y - pix_size/2, y - pix_size/2, y + pix_size/2, y + pix_size/2};
-        th2poly->AddBin(4, bin_x, bin_y);
-    }
-
 }
 void LDataBase::Close()
 {

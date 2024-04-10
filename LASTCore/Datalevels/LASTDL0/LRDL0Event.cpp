@@ -1,5 +1,8 @@
 #include "LRDL0Event.hh"
+#include "TCanvas.h"
 #include "spdlog/spdlog.h"
+#include <root/RtypesCore.h>
+#include "TPaveText.h"
 
 
 LRDL0Event::LRDL0Event(const LJsonConfig& config, const char mode): cmd_config(config), LDL0Event()
@@ -111,9 +114,22 @@ bool LRDL0Event::ReadEvent()
     return true;
 }
 
-void LRDL0Event::DrawEvent(int ievent, int itel)
+void LRDL0Event::Display(std::vector<TCanvas *> &canvases)
 {
-    auto itel_config = (*tel_config)[itel];
-    
-
+    for(auto itel: dl0event->GetKeys())
+    {
+        TCanvas* canvas = new TCanvas(Form("Camera_Image_%d", itel), "LACT RAW Image", 1800, 1800);
+        TH2Poly* camera = new TH2Poly("camera_bin", "", -6, 6, -6, 6);
+        camera->SetMinimum(0.1);
+        camera->SetStats(0);
+        auto tel_event = (*dl0event)[itel];
+        LDataBase::Fill2Poly<Double32_t>(camera, itel, tel_event->GetTruePe());
+        camera->Draw("colz");
+        TPaveText *pavet = new TPaveText(-6, 6.3, 6, 7.6);
+        pavet->SetFillStyle(0);
+        double image_sum = std::accumulate(tel_event->GetTruePe(), tel_event->GetTruePe() + tel_event->GetNumPixels(), 0);
+        pavet->AddText(Form("Event ID: %d, Telescope ID: %d Image Size: %.2lf",tel_event->GetEventId() ,tel_event->GetTelId(), image_sum));
+        pavet->Draw("same");
+        canvas->SaveAs(Form("Event_%d_Tel_%d_dl0.png", tel_event->GetEventId(), tel_event->GetTelId()));
+    }
 }

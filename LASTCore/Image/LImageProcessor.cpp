@@ -160,6 +160,7 @@ void LImageProcessor::ParameterizationImage(const LDL0Event& dl0event, LDL1Event
         Compute_Intensity(*dl1televent);
         Compute_Morphology(*dl1televent);
         dl1event.AddTelEvent(itel, dl1televent);
+        dl1event.AddTelPe(itel, cleaned_image);
     }
 }
 

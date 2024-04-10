@@ -32,7 +32,7 @@
             bool ReadEvent();    // Read Events from TTree.
             TFile* GetRootFile() {return root_file.get();};
             virtual ~LRDL0Event(){};
-            void DrawEvent(int ievent, int itel);
+            void Display(std::vector<TCanvas*>& canvases);
         private:
             int nevents;
             const LJsonConfig& cmd_config;

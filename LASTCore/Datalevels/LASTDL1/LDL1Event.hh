@@ -9,6 +9,7 @@
 #include "../LShower.hh"
 #include "LHillasParameters.hh"
 #include "LDL1TelEvent.hh"
+#include "TCanvas.h"
 
 class LDL1Event : public LDataBase
 {
@@ -18,7 +19,7 @@ class LDL1Event : public LDataBase
         void SetTelHillas(int event_id, int tel_id, LHillasParameters hillas);
         void AddTelEvent(int tel_id, std::shared_ptr<LRDL1TelEvent> dl1televent) { ldl1array->AddTel(tel_id);ldl1event->AddTel(tel_id, dl1televent);};
         void AddTelEvent(int tel_id, LRDL1TelEvent*);
-        void Clear(){ldl1event->Clear(); ldl1array->Clear();};
+        void Clear(){ldl1event->Clear(); ldl1array->Clear(); tel_cleaned_pe.clear();};
         LRDL1TelEvent& operator[](int tel_id) {return *((*ldl1event)[tel_id]);};
         const LRDL1TelEvent& operator[](int tel_id) const {return *((*ldl1event)[tel_id]);};
         std::vector<int> GetTelList() const {return ldl1array->GetTelList();};
@@ -49,12 +50,15 @@ class LDL1Event : public LDataBase
         }
         void FilterTelescope(const std::vector<int> tels) ;
         bool IsEmpty() const { if(ldl1event->GetTelNum() == 0) return true; return false;}
+        void AddTelPe(int tel_id, std::vector<double> pe) {tel_cleaned_pe[tel_id] = pe;};
+        void Display(std::vector<TCanvas*>& canvases);
     protected:
         std::shared_ptr<LTelescopes<std::shared_ptr<LRDL1TelEvent>>> ldl1event;
         LRDL1TelEvent* dl1_tel_event;
         
         LRArray* ldl1array;
         std::string output_fname;
+        std::unordered_map<int, std::vector<double>> tel_cleaned_pe;
 
     
 

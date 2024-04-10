@@ -6,12 +6,14 @@
 #include "LEventRaw.hh"
 #include "TDirectory.h"
 #include "TDirectoryFile.h"
+#include "TH2Poly.h"
 #include "TObject.h"
 #include <memory>
 #include <string>
 #include "../LSimulationImage.hh"
 #include "TFile.h"
 #include "TDirectory.h"
+#include "TCanvas.h"
 class LREventRaw : public LEventRaw
 {
     public:
@@ -30,6 +32,7 @@ class LREventRaw : public LEventRaw
         bool ReadEvent() override;                                             // Read the event from the tree.
         TFile* GetRootFile(){return rootfile.get();};
         void Close();
+        void Display(std::vector<TCanvas*>& );
     private:
        const  LJsonConfig& cmd_config;
        std::unique_ptr<TFile> rootfile;

@@ -25,8 +25,10 @@ int main(int argc, char** argv)
                 continue;
             }
         }
-        last_hillas_reconstructor->ProcessEvent(*lasdtdl1, *lastdl1b);
-        lastdl1b->HandleEvent();
+        if(last_hillas_reconstructor->ProcessEvent(*lasdtdl1, *lastdl1b))
+            lastdl1b->HandleEvent();
+        else
+            continue;
     }
     lastdl1b->StoreTTree();
 

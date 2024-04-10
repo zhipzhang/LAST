@@ -1,13 +1,17 @@
 #include "../LJsonConfig.hh"
 #include "LEventRaw.hh"
 #include "SimTel_File.hh"
+#include "TCanvas.h"
 #include "TDirectory.h"
 #include "TFile.h"
+#include "TH2Poly.h"
 #include "TTree.h"
 #include "LREventRaw.hh"
 #include "spdlog/common.h"
 #include "spdlog/spdlog.h"
 #include <memory>
+#include <numeric>
+#include "TPaveText.h"
 
 LREventRaw::LREventRaw(const LJsonConfig& cmd_config, const char mode): cmd_config(cmd_config),LEventRaw()
 {
@@ -184,4 +188,24 @@ bool LREventRaw::ReadEvent()
 }
 LREventRaw::~LREventRaw()
 {
+}
+
+void LREventRaw::Display(std::vector<TCanvas*>& image)
+{
+    for(auto itel: event->GetImageTelList())
+    {
+        TCanvas* canvas = new TCanvas(Form("Camera_Image_%d", itel), "LACT RAW Image", 1800, 1800);
+        TH2Poly* camera = new TH2Poly("camera_bin", "", -6, 6, -6, 6);
+        camera->SetMinimum(1);
+        auto true_image = event->GetTelImage(itel);
+        LDataBase::Fill2Poly<int>(camera, itel, true_image->true_pe);
+        camera->SetStats(0);
+        camera->Draw("colz");
+        TPaveText *pavet = new TPaveText(-6, 6.3, 6, 7.6);
+        pavet->SetFillStyle(0);
+        int image_sum = std::accumulate(true_image->true_pe, true_image->true_pe + true_image->num_pixels, 0);
+        pavet->AddText(Form("Event ID: %d, Telescope ID: %d Image Size: %d", true_image->event_id, true_image->tel_id, image_sum));
+        pavet->Draw("same");
+        canvas->SaveAs(Form("Event_%d_Tel_%d_raw.png", true_image->event_id, true_image->tel_id));
+    }
 }

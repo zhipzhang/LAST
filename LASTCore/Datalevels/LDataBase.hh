@@ -27,6 +27,7 @@
 #include "TTree.h"
 #include "TFile.h"
 #include "TH2Poly.h"
+#include "TMath.h"
 
 class LDataBase
 {
@@ -57,7 +58,26 @@ class LDataBase
         TDirectory* simulation_config_dir = nullptr;     // When Write, it's directory what we write to; when Read, it's directory what we read from
         TDirectory* instrument_dir = nullptr;            // When Write, it's directory what we write to; when Read, it's directory what we read from
         void Close();
-        void Init2Poly(TH2Poly* th2poly, int itel);
+        template<typename pe_addr>
+        void Fill2Poly(TH2Poly* th2poly, int itel, pe_addr* pe)
+        {
+            if(th2poly->IsZombie())
+            {
+                return;
+            }
+            auto tmpconfig = (*tel_config)[itel];
+        for(int ipix = 0;ipix < tmpconfig->num_pixels; ipix++)
+        {
+            double pix_size = tmpconfig->pix_size /tmpconfig->focal_length * TMath::RadToDeg();
+            double x = tmpconfig->pix_x[ipix] / tmpconfig->focal_length * TMath::RadToDeg();
+            double y = tmpconfig->pix_y[ipix] / tmpconfig->focal_length * TMath::RadToDeg();
+            double bin_x[4] = {x - pix_size/2, x + pix_size/2, x + pix_size/2, x - pix_size/2};
+            double bin_y[4] = {y - pix_size/2, y - pix_size/2, y + pix_size/2, y + pix_size/2};
+            th2poly->AddBin(4, bin_x, bin_y);
+            if(pe[ipix] > 0)
+                th2poly->Fill(x, y, pe[ipix]);
+        }
+        }
 
     private:
         void CopyDirectory(TDirectory* source, TDirectory* dest);
