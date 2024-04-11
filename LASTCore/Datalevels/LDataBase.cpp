@@ -52,7 +52,7 @@ void LDataBase::Read(TFile* f)
     simulation_shower_dir = gDirectory->GetDirectory(simulation_shower_dirname);
     if(simulation_shower_dir)
     {
-        shower_tree = simulation_shower_dir->Get<TTree>("shower");
+        shower_tree = simulation_shower_dir->Get<TTree>("shower_info");
         if(shower_tree)
         {
             shower_tree->SetBranchAddress("shower_info", &ishower);
@@ -212,7 +212,7 @@ void LDataBase::WriteShower(TFile* f)
     {
         simulation_shower_dir = simulation_dir->mkdir(simulation_shower_dirname);
         if( simulation_shower_dir)
-            shower_tree = new TTree("shower", "shower event",99, simulation_shower_dir);
+            shower_tree = new TTree("shower_info", "shower event",99, simulation_shower_dir);
         else
             spdlog::warn("Can't mkdir simulation shower directory in file {}", f->GetName());
         shower_tree->Branch("shower_info", &ishower);

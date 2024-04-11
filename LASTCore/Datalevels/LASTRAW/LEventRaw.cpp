@@ -310,7 +310,7 @@ bool LEventRaw::ProcessEvent()
 }
 void LEventRaw::GetEvent()
 {
-    GetShower(simtel_file->GetHsdata());
+    //GetShower(simtel_file->GetHsdata());
     GetEventShower(simtel_file->GetHsdata());
     GetTrueImage(simtel_file->GetHsdata());
     GetEventWaveform(simtel_file->GetHsdata());
