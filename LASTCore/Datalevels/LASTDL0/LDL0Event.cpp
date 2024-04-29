@@ -54,6 +54,8 @@ void LDL0Event::SetTrueImage(std::shared_ptr<LRDL0TelEvent> itel, LTelTrueImage*
         int original_pe = tel_true_image->true_pe[i];
         double noise = rand->PoissonD(nsb_pe * 1.4);
         double new_pe = original_pe + rand->PoissonD(nsb_pe) - nsb_pe;
+        if(new_pe > 8000)
+            new_pe = 8000;
         itel->SetTruePixPe(i, new_pe);
     }
 
