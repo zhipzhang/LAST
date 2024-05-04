@@ -103,9 +103,12 @@ class LRDL1bTelEvent: public LRDL1TelEvent
             Hillas_h_max = dl1_tel_event.Hillas_h_max;
             n_triggered_tel = dl1_tel_event.n_triggered_tel;
             n_hiias_tel = dl1_tel_event.n_hiias_tel;
+            Hillas_Camerar = dl1_tel_event.Hillas_Camerar;
+            Hillas_Camerax = dl1_tel_event.Hillas_Camerax;
+            Hillas_Cameray = dl1_tel_event.Hillas_Cameray;
             return *this;
         }
-    ClassDef(LRDL1bTelEvent, 1)
+    ClassDef(LRDL1bTelEvent, 2)
 };
 
 

@@ -119,10 +119,7 @@ void LHillasReconstructor::Direction_Reconstruction(LDL1bEvent& ldl1bevent)
     double rec_az, rec_alt = 0;
     LHillasParameters::offset_to_angles(rec_x, rec_y, subarray_pointing_direction.first, subarray_pointing_direction.second, 1, rec_az, rec_alt);
     ldl1bevent.SetRecDirection(rec_az, rec_alt, rec_x_uncertainty, rec_y_uncertainty);
-    for(auto itel: reconstruct_tel)
-    {
-        ldl1bevent[itel].SetCameraPos(rec_x, rec_y);
-    }
+    ldl1bevent.SetRecCameraPos(rec_x, rec_y);
 }
 
 void LHillasReconstructor::Core_Reconstruction(LDL1bEvent& ldl1bevent)

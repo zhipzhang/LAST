@@ -44,6 +44,7 @@ class LDL1bEvent
         {
             auto televent = std::make_shared<LRDL1bTelEvent>();
             *televent = dl1btelevent;
+            televent->SetCameraPos(rec_camerax, rec_cameray);
             ldl1bevent->AddTel(tel_id, televent);
         }
         void Clear()
@@ -78,10 +79,17 @@ class LDL1bEvent
         {
             return *(*ldl1bevent)[tel_id];
         }
+        void SetRecCameraPos(double x, double y)
+        {
+            rec_camerax = x;
+            rec_cameray = y;
+        }
         
     protected:
         std::shared_ptr<LTelescopes<std::shared_ptr<LRDL1bTelEvent>>> ldl1bevent;
         LDL1bArrayEvent* ldl1barrayevent;                  // Store Hillas Reconrtsuctor Results
+        double rec_camerax;
+        double rec_cameray;
         inline double  angle_between(double azimuth1, double altitude1, double azimuth2, double altitude2)
     {
         double ax1 = cos(azimuth1)*cos(altitude1);
