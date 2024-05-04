@@ -74,7 +74,7 @@ bool LHillasReconstructor::ProcessEvent(const LDL1Event& dl1event, LDL1bEvent& d
         double rec_impact_distance = ComputeImpactdistance((*tel_config)[itel]->pos, dl1bevent.GetRecAlt(), dl1bevent.GetRecAz(), dl1bevent.GetRecCoreX(), dl1bevent.GetRecCoreY());
         dl1_tel_event->SetImpactParameters(impact_distance, rec_impact_distance);
         dl1_tel_event->SetShowerInfo(dl1event.GetEventArrayInfo(), dl1event.GetEventArrayInfo().GetTrigNums(), reconstruct_tel.size());
-        dl1bevent.AddTelEvent(itel, dl1_tel_event);
+        dl1bevent.AddTelEvent(itel, *dl1_tel_event);
     }
     dl1bevent.SetDirectionError();
     return true;
@@ -119,6 +119,10 @@ void LHillasReconstructor::Direction_Reconstruction(LDL1bEvent& ldl1bevent)
     double rec_az, rec_alt = 0;
     LHillasParameters::offset_to_angles(rec_x, rec_y, subarray_pointing_direction.first, subarray_pointing_direction.second, 1, rec_az, rec_alt);
     ldl1bevent.SetRecDirection(rec_az, rec_alt, rec_x_uncertainty, rec_y_uncertainty);
+    for(auto itel: reconstruct_tel)
+    {
+        ldl1bevent[itel].SetCameraPos(rec_x, rec_y);
+    }
 }
 
 void LHillasReconstructor::Core_Reconstruction(LDL1bEvent& ldl1bevent)

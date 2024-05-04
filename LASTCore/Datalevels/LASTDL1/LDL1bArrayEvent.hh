@@ -35,6 +35,10 @@ class LDL1bArrayEvent: public LRArray
     Double32_t hillas_hmax;
     Double32_t hillas_hmax_uncertainty;
     Double32_t hillas_direction_error;
+    int GetRecNums() const
+    {
+        return reconstruction_tels.size();
+    }
     void Reset()
     {
         Isvalid = false;

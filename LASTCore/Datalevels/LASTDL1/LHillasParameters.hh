@@ -54,7 +54,7 @@ class LHillasParameters
         }
         static void angles_to_offset(double obj_az, double obj_alt, double az, double alt, double focal_length, double& offset_x, double& offset_y);
         static void offset_to_angles(double offset_x, double offset_y,double az, double alt, double focal_length, double& obj_az, double& obj_alt);
-    private:
+    public:
         double length;          // length of the main axis  [rad]
         double width;           // length of the minor axis [rad]
         double size;            // total size of the image  [Pe.]

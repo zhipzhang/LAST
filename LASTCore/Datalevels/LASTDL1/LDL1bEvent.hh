@@ -40,7 +40,12 @@ class LDL1bEvent
         {
             return ldl1barrayevent->hillas_core_y;
         }
-        void AddTelEvent(int tel_id, std::shared_ptr<LRDL1bTelEvent> dl1btelevent) {ldl1bevent->AddTel(tel_id, dl1btelevent);};
+        void AddTelEvent(int tel_id, const LRDL1bTelEvent& dl1btelevent) 
+        {
+            auto televent = std::make_shared<LRDL1bTelEvent>();
+            *televent = dl1btelevent;
+            ldl1bevent->AddTel(tel_id, televent);
+        }
         void Clear()
         {
             ldl1bevent->Clear();
@@ -60,6 +65,20 @@ class LDL1bEvent
             }
         }
         LRArray& GetEventArrayInfo() {return *ldl1barrayevent;};
+        const LRDL1bTelEvent& GetTelEvent(int i) const
+        {
+            int tel_id = ldl1barrayevent->reconstruction_tels[i];
+            return *(*ldl1bevent)[tel_id];
+        }
+        int GetRecTelID(int i) const
+        {
+            return ldl1barrayevent->reconstruction_tels[i];
+        }
+        LRDL1bTelEvent& operator[](int tel_id)
+        {
+            return *(*ldl1bevent)[tel_id];
+        }
+        
     protected:
         std::shared_ptr<LTelescopes<std::shared_ptr<LRDL1bTelEvent>>> ldl1bevent;
         LDL1bArrayEvent* ldl1barrayevent;                  // Store Hillas Reconrtsuctor Results

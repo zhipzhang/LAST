@@ -7,3 +7,4 @@ TMP/
 bin/
 lib/
 /**/compiled_flags.txt
+/**/*.py

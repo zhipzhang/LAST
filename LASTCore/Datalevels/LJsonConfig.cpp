@@ -7,6 +7,7 @@ DEFINE_string(json_path, "../config.json", "Json file path");
 DEFINE_string(only_telescope,"","Comma-separated llist of telescope ids");
 DEFINE_int32(min_multiplicity, 0, "minimum multiplicity of the shower");
 DEFINE_double(max_leakage2, 0, "max_leakage2 ");
+DEFINE_string(weight, "", "weight vector");
 
 void LJsonConfig::ParseCommandLineFlags(int argc, char **argv)
 {
@@ -20,6 +21,10 @@ void LJsonConfig::ParseCommandLineFlags(int argc, char **argv)
     {
         filter_tel = true;
         only_telescopes = splitStringToInt(FLAGS_only_telescope, ',');
+    }
+    if(FLAGS_weight != "")
+    {
+        weight = splitStringToDouble(FLAGS_weight, ',');
     }
 }
 

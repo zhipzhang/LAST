@@ -32,7 +32,11 @@ add_executable(last-dl1ana LASTDL1Ana.cpp)
 target_link_libraries(last-dl1ana PRIVATE LASTREC)
 target_include_directories(last-dl1ana PRIVATE ${COREDIR})
 
-set(MY_EXECUTABLE_TARGETS last-convert last-dl0gen last-dl1gen last-hillasreco last-dl1ana last-rawdisplay last-dl0display last-dl1display)
+add_executable(last-energyrec LASTDL2aGen.cpp)
+target_link_libraries(last-energyrec PRIVATE LASTDL1 LASTDL2)
+target_include_directories(last-energyrec PRIVATE ${COREDIR})
+
+set(MY_EXECUTABLE_TARGETS last-convert last-dl0gen last-dl1gen last-hillasreco last-dl1ana last-rawdisplay last-dl0display last-dl1display last-energyrec)
 INSTALL(TARGETS ${MY_EXECUTABLE_TARGETS}
     RUNTIME DESTINATION ${CMAKE_BIN_DIR})
 

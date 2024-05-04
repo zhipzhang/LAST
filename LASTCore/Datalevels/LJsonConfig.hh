@@ -90,6 +90,24 @@ class LJsonConfig
     }
         return output;
     }
+    static std::vector<double> splitStringToDouble(const std::string& input, char delimiter) 
+    {
+        std::vector<double> output;
+        std::stringstream ss(input);
+        std::string token;
+        while (std::getline(ss, token, delimiter)) {
+            try {
+                output.push_back(std::stod(token));
+            } catch (const std::invalid_argument& e) {
+                // 处理转换失败的情况
+                std::cerr << "Invalid argument: " << token << std::endl;
+            } catch (const std::out_of_range& e) {
+                // 处理整数超出范围的情况
+                std::cerr << "Out of range: " << token << std::endl;
+            }
+        }
+        return output;
+    }
     static std::vector<std::string> splitString(const std::string& str, char delimiter) {
         std::vector<std::string> tokens;
         std::string token;
@@ -104,6 +122,7 @@ class LJsonConfig
         bool filter_tel = false;
         std::vector<std::string> input_fnames;
         std::vector<int> only_telescopes;
+        std::vector<double> weight;
         LJsonConfig(int argc, char** argv)
         {
             quality_check = new LQualityCheck();

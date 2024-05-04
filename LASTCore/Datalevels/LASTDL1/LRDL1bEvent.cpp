@@ -12,13 +12,14 @@
 #include "LRDL1bEvent.hh"
 #include "LDL1bEvent.hh"
 #include "TFile.h"
+#include "spdlog/spdlog.h"
 
 
 LRDL1bEvent::LRDL1bEvent(const LJsonConfig& config, const char mode): cmd_config(config), LDL1bEvent()
 {
     if( mode == 'r')
     {
-        //ReadROOTFile(cmd_config.GetInputFileName());
+        ReadROOTFile(cmd_config.GetInputFileName());
     }
     if (mode == 'w')
     {
@@ -43,7 +44,62 @@ void LRDL1bEvent::InitROOTFile()
     dl1teltree->Branch("dl1btel", &dl1_televent);
 
 }
+void LRDL1bEvent::ReadROOTFile(std::string filename)
+{
+        if(filename.compare(0, 4, "/eos") == 0)
+    {
+        filename = cmd_config.GetUrl() + filename;
+    }
+    root_file.reset(TFile::Open(filename.c_str(), "READ"));
+    dir = root_file->GetDirectory(dirname);
+    if(dir)
+    {
+        dl1arraytree = dir->Get<TTree>("dl1arraytree");
+        dl1teltree = dir->Get<TTree>("dl1teltree");
+        if(dl1teltree->GetBranch("Estimate_Energy") != nullptr)
+        {
+            have_energy = true;
+            dl1teltree->SetBranchAddress("Estimate_Energy", &Estimate_Energy);
+        }
+        if(dl1teltree->GetBranch("hadroness") != nullptr)
+        {
+            have_hadroness = true;
+            dl1teltree->SetBranchAddress("hadroness", &Estimate_Hadroness);
+        }
+        dl1arraytree->SetBranchAddress("dl1barray", &ldl1barrayevent);
+        dl1teltree->SetBranchAddress("dl1btel", &dl1_televent);
+        nevents = dl1arraytree->GetEntries();
 
+    }
+}
+
+bool LRDL1bEvent::ReadEvent()
+{
+    if( ievents >= nevents)
+    {
+        return false;
+    }
+    dl1arraytree->GetEntry(ievents++);
+    ldl1bevent->Clear();
+    energy_rec.clear();
+    hadroness_rec.clear();
+    for(auto itel: ldl1barrayevent->reconstruction_tels)
+    {
+        dl1teltree->GetEntry(telescope_flag++);
+        if(dl1_televent->GetTelID() != itel || dl1_televent->GetEventID() != ldl1barrayevent->event_id)
+        {
+            spdlog::error("1Can't find the event {} in telescope {}", ldl1barrayevent->event_id, itel);
+            spdlog::error("2Can't find the event {} in telescope {}", dl1_televent->GetEventID(), dl1_televent->GetTelID());
+            return false;
+        }
+        AddTelEvent(itel, *dl1_televent);
+        if(have_energy)
+            energy_rec.push_back(Estimate_Energy);
+        if(have_hadroness)
+            hadroness_rec.push_back(Estimate_Hadroness);
+    }
+    return true;
+}
 void LRDL1bEvent::HandleEvent()
 {
     for(auto itel: ldl1bevent->GetKeys())

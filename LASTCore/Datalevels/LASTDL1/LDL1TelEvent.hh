@@ -12,7 +12,7 @@
 
 class LRDL1TelEvent : public TObject
 {
-    protected:
+    public:
     LHillasParameters hillas;
 
     // Leakage Containers
