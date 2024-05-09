@@ -78,6 +78,7 @@ class LDataBase
                 th2poly->Fill(x, y, pe[ipix]);
         }
         }
+        const LRTelescopeConfig& GetTelConfig(int tel_id) const {return *(*tel_config)[tel_id];};
 
     private:
         void CopyDirectory(TDirectory* source, TDirectory* dest);

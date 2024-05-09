@@ -65,8 +65,8 @@ extern "C" {
 #endif
 
 #ifdef LACT_VERSION
-#define LACT_MAX_TEL 39
-#define LACT_MAX_PIX 4000
+#define LACT_MAX_TEL 130
+#define LACT_MAX_PIX 3000
 #define LACT_MAX_SECTORS LACT_MAX_PIX
 #define LACT_MAX_SLICES 128
 #define LACT_MAX_PIXSECTORS 19

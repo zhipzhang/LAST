@@ -73,6 +73,8 @@ void LDL1Event::Display(std::vector<TCanvas *> &canvases)
           spdlog::warn("No cleaned pe for telescope {}", itel);
           continue;
         }
+        auto tel_pos = GetTelConfig(itel).GetTelpos();
+        double impact_parameter = ComputeImpactdistance(tel_pos.first, tel_pos.second, ldl1array->altitude, ldl1array->azimuth, ldl1array->core_x, ldl1array->core_y);
         LDataBase::Fill2Poly<double>(camera, itel, &tel_cleaned_pe[itel][0]);
         camera->Draw("colz");
         TEllipse* ellipse = new TEllipse(tel_event->GetCogx()* TMath::RadToDeg(), tel_event->GetCogy() * TMath::RadToDeg(), 
@@ -84,7 +86,7 @@ void LDL1Event::Display(std::vector<TCanvas *> &canvases)
         TPaveText *pavet = new TPaveText(-6, 6.3, 6, 7.6);
 
         pavet->SetFillStyle(0);
-        pavet->AddText(Form("Event ID: %d, Telescope ID: %d Image Size: %.2lf", tel_event->GetEventID(), tel_event->GetTelID(), tel_event->GetSize()));
+        pavet->AddText(Form("Event ID: %d, Telescope ID: %d Image Size: %.2lf, IP: %.2lfm, Energy:%.2lfTeV, Xmax:%.2lfg/cm2, h_first:%.2lfm", tel_event->GetEventID(), tel_event->GetTelID(), tel_event->GetSize(), impact_parameter, ldl1array->energy, ldl1array->x_max, ldl1array->h_first_int));
         pavet->Draw("same");
         
         canvas->SaveAs(Form("Event_%d_Tel_%d_dl1.png", tel_event->GetEventID(), tel_event->GetTelID()));

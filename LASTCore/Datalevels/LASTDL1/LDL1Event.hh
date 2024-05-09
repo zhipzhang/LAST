@@ -59,6 +59,30 @@ class LDL1Event : public LDataBase
         LRArray* ldl1array;
         std::string output_fname;
         std::unordered_map<int, std::vector<double>> tel_cleaned_pe;
+    private:
+        static inline double ComputeImpactdistance(double tel_x,double tel_y, double altitude, double azimuth, double x, double y)
+        {
+            double cx = cos(altitude)*cos(azimuth);
+            double cy = -cos(altitude)*sin(azimuth);
+            double cz = sin(altitude);
+            return line_point_distance(x, y, 0, cx, cy, cz, tel_x, tel_y, 0);
+        }
+                static inline double line_point_distance (double xp1, double yp1, double zp1, 
+                    double cx, double cy, double cz,
+                double x, double y, double z)
+        {
+            double a, a1, a2, a3, b;
+    
+            a1 = (y-yp1)*cz - (z-zp1)*cy;
+            a2 = (z-zp1)*cx - (x-xp1)*cz;
+            a3 = (x-xp1)*cy - (y-yp1)*cx;
+            a  = a1*a1 + a2*a2 + a3*a3;
+            b = cx*cx + cy*cy + cz*cz;
+            if ( a<0. || b<= 0. )
+                return -1;
+            return sqrt(a/b);
+        }
+
 
     
 

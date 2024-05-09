@@ -45,6 +45,10 @@ class LRTelescopeConfig : public TObject
         pos[1] = y;
         pos[2] = z;
     }
+    std::pair<double, double> GetTelpos() const
+    {
+        return std::make_pair(pos[0], pos[1]);
+    }
     void InitCameraSet(std::string, int , int);
     LRTelescopeConfig& operator=(const LRTelescopeConfig& other);
     //void InitOptics(std::string, int);
