@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <memory>
 #include <utility>
+#include <vector>
 #include "eigen3/Eigen/Dense"
 #include "spdlog/spdlog.h"
 
@@ -65,6 +66,8 @@ bool LHillasReconstructor::ProcessEvent(const LDL1Event& dl1event, LDL1bEvent& d
     }
     Direction_Reconstruction(dl1bevent);
     Core_Reconstruction(dl1bevent);
+    std::vector<double> rec_hmax;
+    std::vector<double> tel_size;
     for(auto itel: reconstruct_tel)
     {
         auto dl1_tel_event = std::make_shared<LRDL1bTelEvent>();
@@ -72,10 +75,16 @@ bool LHillasReconstructor::ProcessEvent(const LDL1Event& dl1event, LDL1bEvent& d
         dl1_tel_event->CopyTelInfo(dl1event[itel]);
         double impact_distance = ComputeImpactdistance((*tel_config)[itel]->pos, dl1event.GetEventArrayInfo().altitude, dl1event.GetEventArrayInfo().azimuth, dl1event.GetEventArrayInfo().core_x, dl1event.GetEventArrayInfo().core_y);
         double rec_impact_distance = ComputeImpactdistance((*tel_config)[itel]->pos, dl1bevent.GetRecAlt(), dl1bevent.GetRecAz(), dl1bevent.GetRecCoreX(), dl1bevent.GetRecCoreY());
+        rec_hmax.push_back(rec_impact_distance/hillas_dict[itel].cog_r);
+        tel_size.push_back(hillas_dict[itel].GetSize());
         dl1_tel_event->SetImpactParameters(impact_distance, rec_impact_distance);
         dl1_tel_event->SetShowerInfo(dl1event.GetEventArrayInfo(), dl1event.GetEventArrayInfo().GetTrigNums(), reconstruct_tel.size());
         dl1bevent.AddTelEvent(itel, *dl1_tel_event);
     }
+    double hmax = TMath::Mean(rec_hmax.begin(), rec_hmax.end(), tel_size.begin());
+    double mean_intensity = TMath::Mean(tel_size.begin(), tel_size.end());
+    double hmax_uncertainty = TMath::RMS(rec_hmax.begin(), rec_hmax.end(), tel_size.begin());
+    dl1bevent.SetArrayParameter(hmax, mean_intensity, hmax_uncertainty);
     dl1bevent.SetDirectionError();
     return true;
     
@@ -120,6 +129,8 @@ void LHillasReconstructor::Direction_Reconstruction(LDL1bEvent& ldl1bevent)
     LHillasParameters::offset_to_angles(rec_x, rec_y, subarray_pointing_direction.first, subarray_pointing_direction.second, 1, rec_az, rec_alt);
     ldl1bevent.SetRecDirection(rec_az, rec_alt, rec_x_uncertainty, rec_y_uncertainty);
     ldl1bevent.SetRecCameraPos(rec_x, rec_y);
+    std::vector<double> rec_hmax;
+    std::vector<double> size;
 }
 
 void LHillasReconstructor::Core_Reconstruction(LDL1bEvent& ldl1bevent)

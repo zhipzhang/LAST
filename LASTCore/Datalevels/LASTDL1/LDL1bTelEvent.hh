@@ -57,6 +57,11 @@ class LRDL1bTelEvent: public LRDL1TelEvent
             CopyIntensity(dl1_tel_event);
             CopyMorphology(dl1_tel_event);
         }
+        void SetArrayParameter(double hmax, double mean_intensity)
+        {
+            Hillas_h_max = hmax;
+            Hillas_AverageIntensity = mean_intensity;
+        }
         void SetShowerInfo(const LShower& shower)
         {
             True_Energy = shower.energy;

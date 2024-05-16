@@ -84,12 +84,23 @@ class LDL1bEvent
             rec_camerax = x;
             rec_cameray = y;
         }
+        void SetArrayParameter(double hmax, double mean_intensity, double hmax_uncertainty)
+        {
+            for(auto itel: ldl1bevent->GetKeys())
+            {
+                (*ldl1bevent)[itel]->SetArrayParameter(hmax, mean_intensity);
+            }
+            ldl1barrayevent->avearge_intensity = mean_intensity;
+            ldl1barrayevent->hillas_hmax = hmax;
+            ldl1barrayevent->hillas_hmax_uncertainty = hmax_uncertainty;
+        }
         
     protected:
         std::shared_ptr<LTelescopes<std::shared_ptr<LRDL1bTelEvent>>> ldl1bevent;
         LDL1bArrayEvent* ldl1barrayevent;                  // Store Hillas Reconrtsuctor Results
         double rec_camerax;
         double rec_cameray;
+        double rec_hmax;                                   // Maximum Height of the shower, use the rp/dist to estimate
         inline double  angle_between(double azimuth1, double altitude1, double azimuth2, double altitude2)
     {
         double ax1 = cos(azimuth1)*cos(altitude1);
