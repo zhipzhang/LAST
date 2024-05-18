@@ -26,7 +26,14 @@ int main(int argc, char** argv)
             }
         }
         if(last_hillas_reconstructor->ProcessEvent(*lasdtdl1, *lastdl1b))
+        {
+            if(lastdl1b->CheckNaN())
+            {
+                continue;
+            }
             lastdl1b->HandleEvent();
+
+        }
         else
             continue;
     }

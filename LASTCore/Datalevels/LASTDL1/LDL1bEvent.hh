@@ -94,6 +94,16 @@ class LDL1bEvent
             ldl1barrayevent->hillas_hmax = hmax;
             ldl1barrayevent->hillas_hmax_uncertainty = hmax_uncertainty;
         }
+        bool CheckNaN()
+        {
+            if(TMath::IsNaN(ldl1barrayevent->hillas_az) || 
+                TMath::IsNaN(ldl1barrayevent->hillas_alt) || TMath::IsNaN(ldl1barrayevent->hillas_core_x) || TMath::IsNaN(ldl1barrayevent->hillas_core_y))
+            {
+                return true;
+            }
+            return false;
+
+        }
         
     protected:
         std::shared_ptr<LTelescopes<std::shared_ptr<LRDL1bTelEvent>>> ldl1bevent;
