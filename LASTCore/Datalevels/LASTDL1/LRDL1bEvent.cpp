@@ -81,8 +81,6 @@ bool LRDL1bEvent::ReadEvent()
     }
     dl1arraytree->GetEntry(ievents++);
     ldl1bevent->Clear();
-    energy_rec.clear();
-    hadroness_rec.clear();
     for(auto itel: ldl1barrayevent->reconstruction_tels)
     {
         dl1teltree->GetEntry(telescope_flag++);
@@ -90,19 +88,17 @@ bool LRDL1bEvent::ReadEvent()
         {
             spdlog::error("1Can't find the event {} in telescope {}", ldl1barrayevent->event_id, itel);
             spdlog::error("2Can't find the event {} in telescope {}", dl1_televent->GetEventID(), dl1_televent->GetTelID());
-            return false;
+            spdlog::error("The telescope flag is {}", telescope_flag);
+            spdlog::error("The ievent is {}", ievents);
+            continue;
         }
         AddTelEvent(itel, *dl1_televent);
-        if(have_energy)
-            energy_rec.push_back(Estimate_Energy);
-        if(have_hadroness)
-            hadroness_rec.push_back(Estimate_Hadroness);
     }
     return true;
 }
 void LRDL1bEvent::HandleEvent()
 {
-    for(auto itel: ldl1bevent->GetKeys())
+    for(auto itel: ldl1barrayevent->reconstruction_tels)
     {
         dl1_televent = (*ldl1bevent)[itel].get();
         dl1teltree->Fill();

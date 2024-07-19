@@ -8,3 +8,6 @@ bin/
 lib/
 /**/compiled_flags.txt
 /**/*.py
+include/
+share/
+lib64/

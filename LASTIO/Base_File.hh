@@ -124,7 +124,6 @@ class PosixFile : public AbstractFile {
     if (input_file == 0) {
       return false;
     } else {
-      return true;
     }
     struct stat filestat;
     if (fstat(fileno(input_file), &filestat) < 0) {

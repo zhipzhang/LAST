@@ -22,12 +22,12 @@
 	},
 	"LImageQuality":{
 		"num_pixels" : 3,
-		"min_size"   : 100,
+		"min_size"   : 10,
 		"max_leakage2": 0.3
 	},
 	"ShowerProcessor":{
 		"reconstructor_types": ["LHillasReconstructor"],
-		"min_multiplicity" : 4
+		"min_multiplicity" : 2
 	},
 	"MAX_IO_LENGTH": 100000000000,
 	"Camera_Name" : "LASTCamera"
