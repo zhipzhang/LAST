@@ -1,7 +1,6 @@
 #include "LRDL0Event.hh"
 #include "TCanvas.h"
 #include "spdlog/spdlog.h"
-#include <root/RtypesCore.h>
 #include "TPaveText.h"
 
 

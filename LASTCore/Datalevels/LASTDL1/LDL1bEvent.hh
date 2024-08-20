@@ -16,7 +16,6 @@
 #include "../LTelescopesTemplate.hh"
 #include "LDL1bArrayEvent.hh"
 #include <memory>
-#include <root/TMath.h>
 class LDL1bEvent
 {
     public:

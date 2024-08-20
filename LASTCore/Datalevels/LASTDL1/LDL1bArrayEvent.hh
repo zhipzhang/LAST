@@ -14,7 +14,6 @@
 
  #include "../LShower.hh"
 #include "RtypesCore.h"
-#include <root/RtypesCore.h>
 class LDL1bArrayEvent: public LRArray
 {
     public:

@@ -6,7 +6,6 @@
 #include "TPrincipal.h"
 #include <cmath>
 #include <numeric>
-#include <root/TMath.h>
 
 LHillasParameters::LHillasParameters()
 {

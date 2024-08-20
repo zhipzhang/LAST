@@ -22,6 +22,7 @@
 #include <sys/stat.h>
 #include "LAST_types.hh"
 #include "spdlog/spdlog.h"
+#include <iostream>
 using string = std::string;
 class AbstractFile {
  public:
@@ -121,17 +122,17 @@ class PosixFile : public AbstractFile {
  public:
   bool open(string &filename) override {
     input_file = fileopen(filename.c_str(), "rb");
-    if (input_file == 0) {
+    std::cout << "name is " << filename << std::endl;
+    std::cout << "we are here !!" << std::endl;
+    if (input_file == NULL) {
       return false;
     } else {
-    }
-    struct stat filestat;
-    if (fstat(fileno(input_file), &filestat) < 0) {
-      spdlog::error("Failed to get Posix file: {0} information", filename);
-      exit(EXIT_FAILURE);
-    }
-    if (S_ISFIFO(filestat.st_mode)) {
-      compressed = 1;
+      if(filename.find(".gz") != string::npos || filename.find(".zst") != string::npos) {
+        compressed = 1;
+      } else {
+        compressed = 0;
+      }
+      return true;
     }
   }
   void SetFileSize() override {
@@ -186,8 +187,8 @@ class PosixFile : public AbstractFile {
   }
 
  private:
-  FILE *input_file;
-  int compressed; // flag to show whether the file is open by compressed
+  FILE *input_file =NULL;
+  int compressed = 0; // flag to show whether the file is open by compressed
   BYTE buffer[4096];
   void pipe_seek_cur(LASTFileOffset off) {
     int rb;

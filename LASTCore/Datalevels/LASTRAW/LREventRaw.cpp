@@ -9,6 +9,7 @@
 #include "LREventRaw.hh"
 #include "spdlog/common.h"
 #include "spdlog/spdlog.h"
+#include <cstddef>
 #include <memory>
 #include <numeric>
 #include "TPaveText.h"
@@ -39,6 +40,7 @@ LREventRaw::LREventRaw(const LJsonConfig& cmd_config, const char mode): cmd_conf
     {
         ReadROOTFile(cmd_config.GetInputFileName());
     }
+    telescpe_flag = 0;
 }
 LREventRaw::LREventRaw(const LJsonConfig& cmd_config, std::string filename): cmd_config(cmd_config),LEventRaw()
 {
@@ -135,6 +137,8 @@ void LREventRaw::ReadROOTFile(std::string filename)
     {
         filename = cmd_config.GetUrl() + filename;
     }
+    rtel_electronic = new LRTelElectronic();
+    rtel_true_image = new LRTelTrueImage();
     rootfile.reset(TFile::Open(filename.c_str(), "READ"));
     rootfile->cd("simulation");
     Read(rootfile.get());
@@ -168,7 +172,8 @@ bool LREventRaw::ReadEvent()
         event->Clear();
         for( const auto itel: event->event_shower->trigger_tels)
         {
-            true_image_tree->GetEntry(telescpe_flag++);
+            true_image_tree->GetEntry(telescpe_flag);
+            telescpe_flag++;
             //if( waveform_tree->GetEntry(telescpe_flag) != -1)
             //{
             //    HaveWaveform = true;

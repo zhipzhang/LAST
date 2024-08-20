@@ -15,7 +15,6 @@
 #include "../LShower.hh"
 #include "LDL1TelEvent.hh"
 #include "RtypesCore.h"
-#include <root/RtypesCore.h>
 
 class LRDL1bTelEvent: public LRDL1TelEvent
 {

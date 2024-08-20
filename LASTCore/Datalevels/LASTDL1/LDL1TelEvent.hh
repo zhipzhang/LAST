@@ -8,7 +8,6 @@
 #include "RtypesCore.h"
 #include "TObject.h"
 #include "TMath.h"
-#include <root/TMath.h>
 
 class LRDL1TelEvent : public TObject
 {

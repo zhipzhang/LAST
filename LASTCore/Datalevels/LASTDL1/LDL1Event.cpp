@@ -3,7 +3,6 @@
 #include "TCanvas.h"
 #include "spdlog/spdlog.h"
 #include <memory>
-#include <root/TMath.h>
 #include <unordered_map>
 #include "TPaveText.h"
 #include "TEllipse.h"
