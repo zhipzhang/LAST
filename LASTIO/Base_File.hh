@@ -122,8 +122,6 @@ class PosixFile : public AbstractFile {
  public:
   bool open(string &filename) override {
     input_file = fileopen(filename.c_str(), "rb");
-    std::cout << "name is " << filename << std::endl;
-    std::cout << "we are here !!" << std::endl;
     if (input_file == NULL) {
       return false;
     } else {
